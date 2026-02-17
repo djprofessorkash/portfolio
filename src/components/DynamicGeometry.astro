@@ -1,0 +1,1410 @@
+---
+/**
+ * Dynamic Geometry Visualization Canvas Component
+ * 
+ * This component renders an interactive canvas with particle-based animations that respond to 
+ * user interactions and theme changes. The animations toggle between two distinct modes:
+ * - Fractal Mode: Particles move randomly with connection lines forming a web-like structure.
+ * - Orbiting Mode: Particles orbit around a central star in concentric circles.
+ * 
+ * The animation mode is controlled by clicking the "KASH" text in the page center, which also
+ * triggers a smooth color transition and synchronizes with the global theme state.
+ * 
+ * Note: Animations only render on the home page (/) for performance.
+ */
+
+// Check if we're on the home page - only render animations there
+const currentPath = Astro.url.pathname;
+const isHomePage = currentPath === '/' || currentPath === '';
+---
+
+{isHomePage && (
+  <>
+    <canvas id="visualization" class="fixed top-0 left-0 w-full h-full z-10 pointer-events-none"></canvas>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // DOM element references for canvas rendering and theme synchronization.
+      const canvas = document.getElementById("visualization");
+      const ctx = canvas.getContext("2d");
+      const innerKashText = document.getElementById("innerKashText");
+      const targetTheme = document.documentElement;
+  
+      // Canvas center coordinates, dynamically updated on resize events.
+      let centerX = canvas.width / 2;
+      let centerY = canvas.height / 2 - canvas.height / 8;
+      
+      /**
+       * Adjusts the canvas size to match the current window dimensions.
+       * Updates the center coordinates and repositions orbiting particles to maintain
+       * their relative positions around the new center point.
+       */
+      const resizeCanvas = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Recalculate the center point for the canvas and orbital star.
+        centerX = canvas.width / 2;
+        centerY = canvas.height / 2 - canvas.height / 24;
+
+        // Dynamically update each orbiting particle's center reference point.
+        particles.forEach((particle) => {
+          if (particle.mode === 'orbiting') {
+            particle.orbitCenter = { x: centerX, y: centerY };
+          }
+        });
+      };
+  
+      // Particle system configuration and state management.
+      const particles = [];
+      const hazards = []; // Hazard pellets spawned by user clicks (TRON mode only)
+      const baseParticleCount = Math.floor((1 + (Math.random() / 2)) * 100); // Random count between 100-150
+      const particleCount = baseParticleCount; // Current particle count
+      const connectionDistance = 150; // Maximum distance for drawing connection lines between particles.
+
+      // Animation mode state variables.
+      let animationMode = 'fractal'; // Current animation mode: 'fractal', 'orbiting', 'sandfield', or 'tron'
+      let isTransitioning = false; // Prevents rendering artifacts during mode transitions.
+      let orbitDirection = Math.random() < 0.5 ? 1 : -1; // Random initial orbital direction (clockwise or counterclockwise).
+      let starCurrentOpacity = 0; // Current opacity of the central star (smoothly animated).
+      let starTargetOpacity = 0; // Target opacity for smooth transitions.
+      let waveTime = 0; // Time variable for sand field wave animation.
+      
+      // Sand field wave direction (randomized on each mode switch)
+      let waveAngle = Math.random() * Math.PI * 2; // Random angle in radians
+      let waveDirectionX = Math.cos(waveAngle); // Wave direction X component
+      let waveDirectionY = Math.sin(waveAngle); // Wave direction Y component
+      let wavePerpX = -Math.sin(waveAngle); // Perpendicular (layer) direction X
+      let wavePerpY = Math.cos(waveAngle); // Perpendicular (layer) direction Y
+      
+      // Ripple impact system for sand field mode
+      const ripples = []; // Active ripples from click impacts
+      const rippleSpeed = 400; // Pixels per second expansion rate (faster for smoother appearance)
+      const rippleMaxRadius = 2500; // Maximum ripple radius before fadeout (covers entire screen)
+      const rippleDuration = 3500; // Milliseconds before ripple disappears (longer for full propagation)
+      
+      // Theme color for connection lines (RGB format for use with rgba).
+      let themeColorRGB = { r: 217, g: 190, b: 76 }; // Default to gold.
+      
+      // Animation speed control for hover effect.
+      let speedMultiplier = 1.0; // Current speed (1.0 = normal, 0.20 = slowed, 1.50 = accelerated).
+      let targetSpeedMultiplier = 1.0; // Target speed for smooth transitions.
+      let speedTransitionRate = 0.03; // Interpolation rate for speed transitions (lower = slower, more elegant).
+      
+      // KASH text hover state tracking (prevents effect clicks when hovering over mode switcher).
+      let isHoveringKash = false;
+      
+      // Header text hover state tracking (prevents effect clicks when hovering over any header text).
+      let isHoveringHeaderText = false;
+      
+      // Mouse tracking for continuous ripple generation in sand field mode.
+      let isMouseDown = false;
+      let currentMouseX = 0;
+      let currentMouseY = 0;
+      let lastRippleTime = 0;
+      const rippleInterval = 500; // Milliseconds between continuous ripples
+      
+      // Initialize from theme class
+      if (targetTheme.classList.contains("planets")) {
+        animationMode = 'orbiting';
+      } else if (targetTheme.classList.contains("sandfield")) {
+        animationMode = 'sandfield';
+      } else if (targetTheme.classList.contains("tron")) {
+        animationMode = 'tron';
+      } else {
+        animationMode = 'fractal';
+      }
+      starTargetOpacity = animationMode === 'orbiting' ? 1 : 0;
+      starCurrentOpacity = starTargetOpacity; // Set immediately to prevent fade-in
+      
+      // Initialize colors immediately to prevent flash on page load.
+      if (innerKashText) {
+        if (animationMode === 'orbiting') {
+          innerKashText.style.color = "#D9BE4C"; // Gold text for orbiting/planets mode.
+          document.documentElement.style.setProperty('--theme-hover-color', '#D9BE4C'); // Set hover color globally.
+          themeColorRGB = { r: 217, g: 190, b: 76 }; // Gold RGB.
+        } else if (animationMode === 'sandfield') {
+          innerKashText.style.color = "#C4A574"; // Sandy beige text for sand field mode.
+          document.documentElement.style.setProperty('--theme-hover-color', '#C4A574'); // Set hover color globally.
+          themeColorRGB = { r: 196, g: 165, b: 116 }; // Sandy beige RGB.
+        } else if (animationMode === 'tron') {
+          innerKashText.style.color = "#FF6B9D"; // Reddish-pink text for TRON mode.
+          document.documentElement.style.setProperty('--theme-hover-color', '#FF6B9D'); // Set hover color globally.
+          themeColorRGB = { r: 255, g: 107, b: 157 }; // Reddish-pink RGB.
+        } else {
+          innerKashText.style.color = "#bae6fd"; // Light blue (sky-200) text for fractal mode.
+          document.documentElement.style.setProperty('--theme-hover-color', '#bae6fd'); // Set hover color globally.
+          themeColorRGB = { r: 186, g: 230, b: 253 }; // Light blue RGB.
+        }
+      }
+      
+      /**
+       * Synchronizes particle positions with the initialized theme.
+       * Waits 50ms to ensure canvas and particles are fully initialized,
+       * then configures particle positions based on the initial theme state.
+       */
+      setTimeout(() => {
+        // Re-check theme state to ensure consistency.
+        if (targetTheme.classList.contains("planets")) {
+          animationMode = 'orbiting';
+        } else if (targetTheme.classList.contains("sandfield")) {
+          animationMode = 'sandfield';
+        } else if (targetTheme.classList.contains("tron")) {
+          animationMode = 'tron';
+        } else {
+          animationMode = 'fractal';
+        }
+        starTargetOpacity = animationMode === 'orbiting' ? 1 : 0;
+        starCurrentOpacity = starTargetOpacity; // Set immediately to prevent fade-in
+        
+        // Add extra particles if starting in sandfield mode (10-12x total)
+        if (animationMode === 'sandfield') {
+          // Randomize wave direction for sand field
+          waveAngle = Math.random() * Math.PI * 2;
+          waveDirectionX = Math.cos(waveAngle);
+          waveDirectionY = Math.sin(waveAngle);
+          wavePerpX = -Math.sin(waveAngle);
+          wavePerpY = Math.cos(waveAngle);
+          
+          const multiplier = 9 + Math.floor(Math.random() * 3); // Random 9-11 (for 10-12x total)
+          const particlesToAdd = baseParticleCount * multiplier;
+          for (let i = 0; i < particlesToAdd; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            const vx = (Math.random() - 0.5) * 2;
+            const vy = (Math.random() - 0.5) * 2;
+            const particle = new Particle(x, y, vx, vy);
+            particles.push(particle);
+          }
+        } else if (animationMode === 'tron') {
+          // Replace particles with TRON particles if starting in TRON mode
+          particles.length = 0;
+          
+          // Create particles in multiples of 4 (range 4-80)
+          const totalTronParticles = (1 + Math.floor(Math.random() * 20)) * 4; // 4, 8, 12...80
+          const particlesPerSide = totalTronParticles / 4; // Split equally across 4 sides
+          
+          for (let i = 0; i < totalTronParticles; i++) {
+            let x, y, side, direction;
+            const sideIndex = i % particlesPerSide; // Position within this side's group
+            const stratification = (sideIndex / Math.max(1, particlesPerSide - 1)); // 0 to 1 spread
+            
+            if (i < particlesPerSide) {
+              // Left side: spawn stratified along left edge, move right
+              side = 'left';
+              x = Math.random() * (canvas.width * 0.05) + 5; // Narrow spawn zone
+              y = (stratification * canvas.height * 0.9) + (canvas.height * 0.05); // Spread vertically
+              direction = 0; // Move right
+            } else if (i < particlesPerSide * 2) {
+              // Right side: spawn stratified along right edge, move left
+              side = 'right';
+              x = canvas.width * 0.95 + Math.random() * (canvas.width * 0.05) - 5; // Narrow spawn zone
+              y = (stratification * canvas.height * 0.9) + (canvas.height * 0.05); // Spread vertically
+              direction = 2; // Move left
+            } else if (i < particlesPerSide * 3) {
+              // Top side: spawn stratified along top edge, move down
+              side = 'top';
+              x = (stratification * canvas.width * 0.9) + (canvas.width * 0.05); // Spread horizontally
+              y = Math.random() * (canvas.height * 0.05) + 5; // Narrow spawn zone
+              direction = 1; // Move down
+            } else {
+              // Bottom side: spawn stratified along bottom edge, move up
+              side = 'bottom';
+              x = (stratification * canvas.width * 0.9) + (canvas.width * 0.05); // Spread horizontally
+              y = canvas.height * 0.95 + Math.random() * (canvas.height * 0.05) - 5; // Narrow spawn zone
+              direction = 3; // Move up
+            }
+            
+            const particle = new Particle(x, y, 0, 0);
+            particle.side = side;
+            particle.direction = direction;
+            particle.mode = 'tron';
+            // Vary timing for direction changes so particles don't move in sync
+            particle.nextDirectionChange = Date.now() + Math.random() * 1000 + (sideIndex * 50);
+            particles.push(particle);
+          }
+        }
+        
+        // Initialize particles with the correct mode state.
+        particles.forEach((particle, index) => {
+          if (animationMode === 'orbiting') {
+            // Distribute particles evenly around circles to create organized orbital rings.
+            const angle = (index / particles.length) * Math.PI * 2;
+            const distance = 50 + (index % 5) * 100; // Creates 5 distinct concentric rings.
+            
+            particle.x = centerX + Math.cos(angle) * distance;
+            particle.y = centerY + Math.sin(angle) * distance;
+            
+            const dx = particle.x - centerX;
+            const dy = particle.y - centerY;
+            const actualDistance = Math.sqrt(dx * dx + dy * dy);
+            particle.orbitSpeed = Math.max(0.5, 200 / actualDistance) * 0.015;
+            particle.orbitAngle = Math.atan2(dy, dx);
+            particle.orbitDirection = orbitDirection;
+            particle.orbitCenter = { x: centerX, y: centerY };
+            particle.mode = 'orbiting';
+          } else if (animationMode === 'sandfield') {
+            // Position particles in diagonal layers for sand field effect
+            // Wave goes from bottom-left to top-right, so layers go from bottom-right to top-left
+            const layerAngle = Math.PI / 4; // 45 degrees for diagonal
+            const layerSpacing = 50; // Distance between layers
+            const layerIndex = Math.floor(index / 10); // ~10 particles per layer
+            const positionInLayer = index % 10;
+            
+            // Base position along the diagonal layer
+            particle.baseX = (layerIndex * layerSpacing * Math.cos(layerAngle - Math.PI/2)) + 
+                            (positionInLayer * canvas.width / 10) + 
+                            (Math.random() - 0.5) * 30; // Slight randomness
+            particle.baseY = (layerIndex * layerSpacing * Math.sin(layerAngle - Math.PI/2)) + 
+                            (positionInLayer * canvas.height / 10) + 
+                            (Math.random() - 0.5) * 30; // Slight randomness
+            
+            // Wrap positions to canvas
+            particle.baseX = ((particle.baseX % canvas.width) + canvas.width) % canvas.width;
+            particle.baseY = ((particle.baseY % canvas.height) + canvas.height) % canvas.height;
+            
+            particle.x = particle.baseX;
+            particle.y = particle.baseY;
+            
+            // Calculate layer number based on perpendicular distance to wave direction
+            // Uses randomized perpendicular direction to maintain layer alignment
+            const layerPosition = (particle.baseX * wavePerpX + particle.baseY * wavePerpY) / Math.sqrt(wavePerpX * wavePerpX + wavePerpY * wavePerpY);
+            const layerNumber = Math.floor(layerPosition / 30); // 30px layer width
+            
+            // Synchronize phase for particles in same layer with slight randomness
+            particle.wavePhase = (layerNumber * 0.5) + (Math.random() - 0.5) * 0.2;
+            particle.mode = 'sandfield';
+          } else if (animationMode === 'tron') {
+            // TRON particles are pre-initialized with their properties
+            particle.mode = 'tron';
+          } else {
+            particle.mode = 'fractal';
+          }
+        });
+      }, 50);
+  
+      // Cursor position tracker for interactive particle connections.
+      // Initialized off-screen to prevent unwanted connections on page load.
+      const cursor = { x: -100, y: -100 };
+  
+      /**
+       * Particle Class
+       * 
+       * Represents an individual particle in the animation system with properties for both
+       * fractal (random movement) and orbiting behaviors. Each particle can smoothly transition
+       * between modes and maintains visual state including position, velocity, size, and tracer paths.
+       */
+      class Particle {
+        /**
+         * Initializes a new particle with position and velocity.
+         * @param {number} x - Initial x-coordinate position.
+         * @param {number} y - Initial y-coordinate position.
+         * @param {number} vx - Velocity along the x-axis.
+         * @param {number} vy - Velocity along the y-axis.
+         */
+        constructor(x, y, vx, vy) {
+          this.x = x;
+          this.y = y;
+          this.vx = vx;
+          this.vy = vy;
+          this.size = 0.35; // Current rendered size.
+          this.sizeTarget = this.size; // Target size for smooth animated transitions.
+          this.tracerPath = []; // Stores recent positions for rendering orbital trail effects.
+          this.mode = 'fractal'; // Current mode: 'fractal', 'orbiting', or 'sandfield'
+          this.orbitSpeed = 0.01 + Math.random() * 0.02; // Angular velocity for orbital motion.
+          this.orbitAngle = Math.random() * Math.PI * 2; // Current angle in orbital path (radians).
+          this.orbitCenter = { x: centerX, y: centerY }; // Center point for orbital motion.
+          this.orbitDirection = orbitDirection; // Orbital direction: 1 = clockwise, -1 = counterclockwise.
+          
+          // Sand field specific properties
+          this.baseX = x; // Original x position for wave motion
+          this.baseY = y; // Original y position for wave motion
+          this.wavePhase = Math.random() * Math.PI * 2; // Random phase offset for wave
+          this.shapeType = Math.floor(Math.random() * 11); // 0=circle, 3-12=polygon sides
+          this.layerDepth = 0; // Depth in layer (for subtle variations)
+          this.sizeVariation = 0.8 + Math.random() * 0.4; // ±20% size variation (0.8 to 1.2)
+          
+          // TRON mode specific properties
+          this.side = 'left'; // 'left', 'right', 'top', or 'bottom' side of screen
+          this.direction = 0; // 0=right, 1=down, 2=left, 3=up (Manhattan directions)
+          this.moveSpeed = 1.5; // Pixels per frame
+          this.nextDirectionChange = Date.now() + Math.random() * 500 + 300; // Random direction change timing (300-800ms)
+          this.tronTracerPath = []; // Trail positions for TRON mode
+          this.tronTracerMaxLength = 320; // Maximum tracer length (increased 160% for longer trails)
+          
+          // Respawn properties for hazard collision
+          this.isRespawning = false; // Flag when particle is waiting to respawn
+          this.respawnTime = 0; // Timestamp when particle should respawn
+        }
+  
+        /**
+         * Updates the particle's position and visual properties based on its current mode.
+         * Handles both orbiting behavior (circular motion around center) and fractal behavior
+         * (random movement with screen wrapping).
+         */
+        update() {
+          // Skip updating if particle is respawning
+          if (this.isRespawning) return;
+          
+          if (this.mode === 'orbiting') {
+            // Calculate current orbital radius from the center point.
+            const currentRadius = Math.hypot(this.x - this.orbitCenter.x, this.y - this.orbitCenter.y);
+            const targetRadius = currentRadius;
+
+            // Apply damping factor to stabilize orbital radius and prevent jittery motion.
+            const dampingFactor = 0.9; // Higher values = more stability (less responsive to changes).
+            const adjustedRadius = currentRadius + (targetRadius - currentRadius) * (1 - dampingFactor);
+
+            // Update position using polar coordinates (angle and radius).
+            // Apply speed multiplier for hover slowdown effect.
+            this.orbitAngle += this.orbitSpeed * this.orbitDirection * speedMultiplier;
+            this.x = this.orbitCenter.x + adjustedRadius * Math.cos(this.orbitAngle);
+            this.y = this.orbitCenter.y + adjustedRadius * Math.sin(this.orbitAngle);
+
+            // Keep orbit center synchronized with the canvas center.
+            this.orbitCenter = { x: centerX, y: centerY };
+
+            // Calculate distance from center for size calculations.
+            const dx = this.x - centerX;
+            const dy = this.y - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // Maintain a short history of positions for rendering orbital trails.
+            this.tracerPath.push({ x: this.x, y: this.y });
+            if (this.tracerPath.length > 5) this.tracerPath.shift();
+
+            // Scale particle size based on distance from center (planet-like appearance).
+            this.sizeTarget = Math.min(7.5, distance / 75);
+          } else if (this.mode === 'sandfield') {
+            // Sand field mode: Wave motion in randomized direction
+            // Uses global wave direction that was randomized on mode entry
+            
+            // Calculate position along wave direction
+            const directionMagnitude = Math.sqrt(waveDirectionX * waveDirectionX + waveDirectionY * waveDirectionY);
+            const projectionDistance = (this.baseX * waveDirectionX + this.baseY * waveDirectionY) / directionMagnitude;
+            
+            // Calculate wave displacement (perpendicular to wave direction)
+            const waveAmplitude = 15; // Maximum displacement
+            const waveFrequency = 0.005; // How many waves across the screen
+            const waveDisplacement = Math.sin(projectionDistance * waveFrequency + waveTime + this.wavePhase) * waveAmplitude;
+            
+            // Apply displacement perpendicular to wave direction
+            let totalDisplacementX = wavePerpX * waveDisplacement * speedMultiplier;
+            let totalDisplacementY = wavePerpY * waveDisplacement * speedMultiplier;
+            
+            // Add ripple effects from click impacts
+            ripples.forEach((ripple) => {
+              const dx = this.baseX - ripple.x;
+              const dy = this.baseY - ripple.y;
+              const distanceToRipple = Math.sqrt(dx * dx + dy * dy);
+              
+              // Calculate ripple radius at current time
+              const elapsed = Date.now() - ripple.startTime;
+              const currentRadius = (elapsed / 1000) * rippleSpeed;
+              
+              // Only affect particles near the ripple wavefront
+              const wavefrontWidth = 150; // Width of the active wave band (wider for stronger effect)
+              const distanceFromWavefront = Math.abs(distanceToRipple - currentRadius);
+              
+              if (distanceFromWavefront < wavefrontWidth && currentRadius < rippleMaxRadius) {
+                // Calculate ripple strength (fades over time and distance from wavefront)
+                const timeFade = Math.max(0, 1 - (elapsed / rippleDuration));
+                const distanceFade = 1 - (distanceFromWavefront / wavefrontWidth);
+                const strength = timeFade * distanceFade * 50; // 50px max displacement for strong ocean-like impact
+                
+                // Oscillating displacement with smoother sine wave and lower frequency
+                const angle = Math.atan2(dy, dx);
+                const oscillation = Math.sin((distanceToRipple - currentRadius) * 0.08 + elapsed * 0.012);
+                
+                totalDisplacementX += Math.cos(angle) * strength * oscillation;
+                totalDisplacementY += Math.sin(angle) * strength * oscillation;
+              }
+            });
+            
+            this.x = this.baseX + totalDisplacementX;
+            this.y = this.baseY + totalDisplacementY;
+            
+            // Slightly larger size for sand field particles with random variation
+            this.sizeTarget = 1.2 * this.sizeVariation;
+          } else if (this.mode === 'tron') {
+            // TRON mode: Manhattan movement (cardinal directions only)
+            const now = Date.now();
+            
+            // Randomly change direction at intervals (only perpendicular turns, no reversing)
+            if (now >= this.nextDirectionChange) {
+              if (this.direction === 0 || this.direction === 2) {
+                // Moving horizontally (right or left), can only turn up or down
+                this.direction = Math.random() < 0.5 ? 1 : 3;
+              } else {
+                // Moving vertically (up or down), can only turn left or right
+                this.direction = Math.random() < 0.5 ? 0 : 2;
+              }
+              this.nextDirectionChange = now + Math.random() * 500 + 300; // 300-800ms
+            }
+            
+            // Move in current direction
+            let nextX = this.x;
+            let nextY = this.y;
+            
+            switch(this.direction) {
+              case 0: nextX += this.moveSpeed * speedMultiplier; break; // right
+              case 1: nextY += this.moveSpeed * speedMultiplier; break; // down
+              case 2: nextX -= this.moveSpeed * speedMultiplier; break; // left
+              case 3: nextY -= this.moveSpeed * speedMultiplier; break; // up
+            }
+            
+            // Boundary collision detection - bounce off edges by changing direction
+            if (nextX <= 5 || nextX >= canvas.width - 5) {
+              this.direction = (this.direction === 0) ? 2 : 0; // Switch between left/right
+              if (nextX <= 5) nextX = 5;
+              if (nextX >= canvas.width - 5) nextX = canvas.width - 5;
+            }
+            if (nextY <= 5 || nextY >= canvas.height - 5) {
+              this.direction = (this.direction === 1) ? 3 : 1; // Switch between up/down
+              if (nextY <= 5) nextY = 5;
+              if (nextY >= canvas.height - 5) nextY = canvas.height - 5;
+            }
+            
+            // Update position
+            this.x = nextX;
+            this.y = nextY;
+            
+            // Maintain tracer path
+            this.tronTracerPath.push({ x: this.x, y: this.y });
+            if (this.tronTracerPath.length > this.tronTracerMaxLength) {
+              this.tronTracerPath.shift();
+            }
+            
+            // Small particle size
+            this.sizeTarget = 0.5;
+          } else {
+            // Fractal mode: Apply random velocity-based movement with speed multiplier.
+            this.x += this.vx * speedMultiplier;
+            this.y += this.vy * speedMultiplier;
+    
+            // Implement screen wrapping to keep particles visible and create continuous motion.
+            if (this.x < 0) this.x = canvas.width;
+            if (this.x > canvas.width) this.x = 0;
+            if (this.y < 0) this.y = canvas.height;
+            if (this.y > canvas.height) this.y = 0;
+
+            // Use smaller size for fractal mode particles.
+            this.sizeTarget = 0.35;
+          }
+          
+          // Smoothly interpolate current size toward target size for fluid transitions.
+          this.size += (this.sizeTarget - this.size) * 0.1;
+        }
+  
+        /**
+         * Renders the particle and its visual effects to the canvas.
+         * Draws orbital trails when in orbiting mode, polygons in sand field mode, or circles otherwise.
+         */
+        draw() {
+          // Skip drawing if particle is respawning
+          if (this.isRespawning) return;
+          
+          if (this.mode === 'orbiting') {
+            // Draw orbital trail lines with fading opacity for a comet-like effect.
+            for (let i = 0; i < this.tracerPath.length - 1; i++) {
+              const opacity = (i + 1) / this.tracerPath.length; // Gradually increase opacity toward most recent position.
+              ctx.beginPath();
+              ctx.moveTo(this.tracerPath[i].x, this.tracerPath[i].y);
+              ctx.lineTo(this.tracerPath[i + 1].x, this.tracerPath[i + 1].y);
+              ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+              ctx.lineWidth = 1;
+              ctx.stroke();
+              ctx.closePath();
+            }
+          }
+
+          if (this.mode === 'sandfield') {
+            // Render sand field particle as small polygon (circle to dodecagon)
+            ctx.beginPath();
+            
+            if (this.shapeType === 0) {
+              // Circle
+              ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            } else {
+              // Polygon (3-12 sides)
+              const sides = Math.max(3, this.shapeType);
+              const angleStep = (Math.PI * 2) / sides;
+              
+              for (let i = 0; i <= sides; i++) {
+                const angle = i * angleStep;
+                const px = this.x + Math.cos(angle) * this.size;
+                const py = this.y + Math.sin(angle) * this.size;
+                
+                if (i === 0) {
+                  ctx.moveTo(px, py);
+                } else {
+                  ctx.lineTo(px, py);
+                }
+              }
+              ctx.closePath();
+            }
+            
+            ctx.fillStyle = "white";
+            ctx.fill();
+          } else if (this.mode === 'tron') {
+            // TRON mode: Draw tracer path with color based on side
+            let color;
+            if (this.side === 'left') {
+              color = '210, 210, 220'; // Silver-white (not pure white for contrast)
+            } else if (this.side === 'right') {
+              color = '255, 140, 0'; // Orange
+            } else if (this.side === 'top') {
+              color = '255, 255, 0'; // Yellow
+            } else { // bottom
+              color = '0, 150, 255'; // Blue
+            }
+            
+            // Draw tracer path
+            if (this.tronTracerPath.length > 1) {
+              for (let i = 0; i < this.tronTracerPath.length - 1; i++) {
+                const opacity = (i + 1) / this.tronTracerPath.length * 0.8;
+                const width = 2 + (i / this.tronTracerPath.length) * 2;
+                
+                ctx.beginPath();
+                ctx.moveTo(this.tronTracerPath[i].x, this.tronTracerPath[i].y);
+                ctx.lineTo(this.tronTracerPath[i + 1].x, this.tronTracerPath[i + 1].y);
+                ctx.strokeStyle = `rgba(${color}, ${opacity})`;
+                ctx.lineWidth = width;
+                ctx.stroke();
+                ctx.closePath();
+              }
+            }
+            
+            // Draw particle itself (nearly imperceptible)
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${color}, 0.3)`;
+            ctx.fill();
+            ctx.closePath();
+          } else {
+            // Render the particle as a white circle at its current position (fractal/orbiting).
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = "white";
+            ctx.fill();
+            ctx.closePath();
+          }
+        }
+      }
+      
+      /**
+       * Hazard pellet class for click-spawned obstacles that destroy particles on collision.
+       */
+      class Hazard {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.radius = 8; // Core radius (reduced from 12)
+          this.glowRadius = 40; // Visual glow radius (200% increase, also collision zone)
+          this.pulsePhase = Math.random() * Math.PI * 2; // Random pulse offset
+          this.isExploding = false;
+          this.explosionRadius = 0;
+          this.explosionMaxRadius = 80;
+          this.explosionSpeed = 5;
+          this.opacity = 1;
+          this.alive = true;
+          this.particleColor = null; // Store color of particle that hit this hazard
+        }
+        
+        /**
+         * Updates hazard state (explosion animation if triggered)
+         */
+        update(speedMultiplier = 1.0) {
+          if (this.isExploding) {
+            this.explosionRadius += this.explosionSpeed;
+            this.opacity = 1 - (this.explosionRadius / this.explosionMaxRadius);
+            
+            if (this.explosionRadius >= this.explosionMaxRadius) {
+              this.alive = false;
+            }
+          }
+          
+          // Pulse animation for glow (affected by speed multiplier)
+          this.pulsePhase += 0.1 * speedMultiplier;
+        }
+        
+        /**
+         * Draws the hazard pellet with glowing effect
+         */
+        draw(ctx) {
+          if (this.isExploding) {
+            // Draw expanding explosion with mostly red and colorized ring for particle color
+            const baseRed = 'rgba(255, 0, 0'; // Bright red base
+            const particleEffect = this.particleColor ? `rgba(${this.particleColor}` : baseRed;
+            
+            // Main red explosion ring (outer)
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.explosionRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = `${baseRed}, ${this.opacity * 0.9})`;
+            ctx.lineWidth = 5;
+            ctx.stroke();
+            ctx.closePath();
+            
+            // Particle color band (inner ring - full circle)
+            if (this.particleColor) {
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, this.explosionRadius * 0.7, 0, Math.PI * 2);
+              ctx.strokeStyle = `${particleEffect}, ${this.opacity * 0.9})`;
+              ctx.lineWidth = 6;
+              ctx.stroke();
+              ctx.closePath();
+            }
+            
+            // Inner red fill
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.explosionRadius * 0.5, 0, Math.PI * 2);
+            ctx.fillStyle = `${baseRed}, ${this.opacity * 0.4})`;
+            ctx.fill();
+            ctx.closePath();
+          } else {
+            // Draw pulsing glow with square-ish shape
+            const pulse = Math.sin(this.pulsePhase) * 0.3 + 0.7; // 0.4 to 1.0
+            const currentGlowRadius = this.glowRadius * pulse;
+            
+            // Gradient glow (circular for smooth falloff)
+            const gradient = ctx.createRadialGradient(
+              this.x, this.y, 0,
+              this.x, this.y, currentGlowRadius
+            );
+            gradient.addColorStop(0, 'rgba(255, 0, 0, 0.9)'); // Bright red center
+            gradient.addColorStop(0.3, 'rgba(255, 0, 0, 0.6)');
+            gradient.addColorStop(0.6, 'rgba(255, 0, 0, 0.3)');
+            gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+            
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, currentGlowRadius, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            ctx.closePath();
+            
+            // Draw solid square-ish core with rounded corners (smaller, all neon red)
+            const coreSize = this.radius * 0.75; // Reduced size
+            ctx.beginPath();
+            ctx.roundRect(this.x - coreSize, this.y - coreSize, coreSize * 2, coreSize * 2, 3);
+            ctx.fillStyle = 'rgba(255, 0, 0, 1)'; // Pure neon red
+            ctx.fill();
+            ctx.closePath();
+          }
+        }
+        
+        /**
+         * Triggers explosion animation
+         */
+        explode(particleColor) {
+          this.isExploding = true;
+          this.particleColor = particleColor; // Store particle color for explosion effects
+        }
+        
+        /**
+         * Checks collision with a particle
+         */
+        checkCollision(particle) {
+          if (this.isExploding || particle.isRespawning) return false;
+          
+          const dx = this.x - particle.x;
+          const dy = this.y - particle.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          // Use glowRadius as collision zone instead of small radius
+          return distance < this.glowRadius;
+        }
+      }
+  
+      /**
+       * Initializes all particles with random positions and velocities.
+       * Pre-calculates orbital properties for each particle for smooth transitions.
+       */
+      for (let i = 0; i < particleCount; i++) {
+        // Generate random initial positions across the canvas.
+        const x = Math.random() * canvas.width ** 2;
+        const y = Math.random() * canvas.height ** 2;
+        
+        // Generate random velocities for fractal mode movement.
+        const vx = (Math.random() - 0.5) * 2;
+        const vy = (Math.random() - 0.5) * 2;
+
+        const particle = new Particle(x, y, vx, vy);
+
+        // Pre-calculate orbital properties based on distance from center.
+        // Particles closer to the center orbit faster (simulates gravitational physics).
+        const dx = particle.x - centerX;
+        const dy = particle.y - centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        particle.orbitSpeed = Math.max(0.5, 150 / distance) * 0.01275;
+        particle.orbitAngle = Math.atan2(dy, dx);
+        particle.orbitCenter = { x: centerX, y: centerY };
+
+        particles.push(particle);
+      }
+  
+      /**
+       * Mouse Movement Event Handler
+       * Tracks cursor position for drawing interactive connection lines between cursor and nearby particles.
+       */
+      document.addEventListener("mousemove", (event) => {
+        const rect = canvas.getBoundingClientRect();
+        cursor.x = event.clientX - rect.left;
+        cursor.y = event.clientY - rect.top;
+      });
+  
+      /**
+       * Mouse Click Event Handler
+       * In orbiting mode: Relocates the central Sun to the clicked position and updates all particle orbits.
+       * In fractal mode: Applies a propulsion force to nearby particles, pushing them away from the click point.
+       */
+      document.addEventListener("mousedown", (event) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+  
+        // Skip effect-specific clicks when hovering over KASH text or header text (prevents unintended interactions)
+        if (isHoveringKash || isHoveringHeaderText) {
+          return;
+        }
+  
+        if (animationMode === 'orbiting') {
+          // Orbiting mode: Relocate the Sun to the clicked position with animated fade out/in
+          const targetOpacity = starTargetOpacity;
+          const savedSpeedMultiplier = targetSpeedMultiplier;
+          
+          // Fade out the Sun at the old position and slow down particles
+          starTargetOpacity = 0;
+          targetSpeedMultiplier = 0.3;
+          
+          // After fade out completes, relocate and fade back in
+          setTimeout(() => {
+            // Only proceed if still in orbiting mode (user might have toggled during fade)
+            if (animationMode === 'orbiting') {
+              // Update the center position to the clicked location
+              centerX = x;
+              centerY = y;
+              
+              // Update all particles to orbit around the new center position
+              particles.forEach((particle) => {
+                particle.orbitCenter = { x: centerX, y: centerY };
+                
+                // Recalculate orbital angle based on new center position
+                const dx = particle.x - centerX;
+                const dy = particle.y - centerY;
+                particle.orbitAngle = Math.atan2(dy, dx);
+                
+                // Recalculate orbital speed based on new distance from center
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                particle.orbitSpeed = Math.max(0.5, 200 / distance) * 0.015;
+              });
+              
+              // Fade the star back in at the new position and restore speed
+              starTargetOpacity = targetOpacity;
+              targetSpeedMultiplier = savedSpeedMultiplier;
+            }
+          }, 400); // Wait for fade out animation (400ms gives nicely slow transition)
+        } else if (animationMode === 'fractal') {
+          // Fractal mode: Apply radial propulsion force to nearby particles
+          particles.forEach((particle) => {
+            const dx = particle.x - x;
+            const dy = particle.y - y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+      
+            if (distance < connectionDistance) {
+              // Apply radial propulsion force away from click point.
+              const angle = Math.atan2(dy, dx);
+              particle.vx = Math.cos(angle) * 1.5;
+              particle.vy = Math.sin(angle) * 1.5;
+            }
+          });
+        } else if (animationMode === 'sandfield') {
+          // Sand field mode: Start continuous ripple generation
+          isMouseDown = true;
+          currentMouseX = x;
+          currentMouseY = y;
+          
+          // Create initial ripple immediately
+          ripples.push({
+            x: x,
+            y: y,
+            startTime: Date.now()
+          });
+          lastRippleTime = Date.now();
+        }
+      });
+      
+      /**
+       * Mouse Move Event Handler
+       * Updates cursor position for continuous ripple generation in sand field mode.
+       */
+      document.addEventListener("mousemove", (event) => {
+        if (isMouseDown && animationMode === 'sandfield') {
+          const rect = canvas.getBoundingClientRect();
+          currentMouseX = event.clientX - rect.left;
+          currentMouseY = event.clientY - rect.top;
+        }
+      });
+      
+      /**
+       * Mouse Up Event Handler
+       * Stops continuous ripple generation when mouse button is released.
+       */
+      document.addEventListener("mouseup", () => {
+        isMouseDown = false;
+      });
+      
+      /**
+       * Document Click Event Handler
+       * Spawns hazard pellets at click location in TRON mode
+       * Uses document-level listener to avoid blocking header/footer interactions
+       * Canvas remains pointer-events-none to allow clicks to pass through
+       */
+      document.addEventListener("click", (event) => {
+        if (animationMode === 'tron' && !isHoveringKash && !isHoveringHeaderText && canvas) {
+          const target = event.target;
+          
+          // Check if the click target is interactive or within an interactive container
+          const isInteractive = target && (
+            target.tagName === 'A' ||
+            target.tagName === 'BUTTON' ||
+            target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.tagName === 'SELECT' ||
+            target.tagName === 'IMG' ||
+            target.closest('a') ||
+            target.closest('button') ||
+            target.closest('nav') ||
+            target.closest('header') ||
+            target.closest('footer') ||
+            target.hasAttribute('role') && ['button', 'link'].includes(target.getAttribute('role'))
+          );
+          
+          // Only spawn hazard if not over interactive elements
+          if (!isInteractive) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            hazards.push(new Hazard(x, y));
+          }
+        }
+      });
+  
+      /**
+       * Main Animation Loop
+       * Continuously renders the canvas at ~60fps using requestAnimationFrame.
+       * Handles clearing, drawing the central star, connection lines, cursor interactions,
+       * and updating/rendering all particles.
+       */
+      const animate = () => {
+        // Clear the entire canvas to prepare for the new frame.
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+        // Increment wave time for sand field animation
+        waveTime += 0.02 * speedMultiplier;
+        
+        // Clean up expired ripples in sand field mode
+        if (animationMode === 'sandfield') {
+          const now = Date.now();
+          for (let i = ripples.length - 1; i >= 0; i--) {
+            if (now - ripples[i].startTime > rippleDuration) {
+              ripples.splice(i, 1);
+            }
+          }
+          
+          // Generate continuous ripples while mouse is held down
+          if (isMouseDown && !isHoveringKash && !isHoveringHeaderText && now - lastRippleTime >= rippleInterval) {
+            ripples.push({
+              x: currentMouseX,
+              y: currentMouseY,
+              startTime: now
+            });
+            lastRippleTime = now;
+          }
+        }
+  
+        // Smoothly interpolate speed multiplier for hover effect transitions.
+        // Lower interpolation factor creates more elegant, gradual transitions.
+        speedMultiplier += (targetSpeedMultiplier - speedMultiplier) * speedTransitionRate;
+  
+        // Render the central star with a radial gradient when in orbiting mode only.
+        // Opacity smoothly transitions in/out when switching between modes.
+        // The gradient radius scales with opacity to create collapse/grow effect.
+        if (animationMode === 'orbiting') {
+          starCurrentOpacity += (starTargetOpacity - starCurrentOpacity) * 0.1;
+
+          // Scale the gradient radius based on opacity for collapse/grow effect
+          const maxRadius = Math.min(canvas.width, canvas.height) / 24;
+          const currentRadius = maxRadius * starCurrentOpacity;
+
+          const gradient = ctx.createRadialGradient(
+            centerX,
+            centerY,
+            0,
+            centerX,
+            centerY,
+            currentRadius
+          );
+          // Brighter golden color (RGB: 255, 223, 100) - lighter than "KASH" text for Sun glow
+          gradient.addColorStop(0, `rgba(255, 223, 100, ${starCurrentOpacity})`);
+          gradient.addColorStop(0.25, `rgba(255, 223, 100, ${0.75 * starCurrentOpacity})`);
+          gradient.addColorStop(0.55, `rgba(255, 223, 100, ${0.5 * starCurrentOpacity})`);
+          gradient.addColorStop(1, `rgba(255, 223, 100, 0)`);
+
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Draw connection lines between nearby particles in fractal mode.
+        // Lines are only rendered between particles in fractal mode to prevent visual glitches.
+        if (animationMode === 'fractal' && !isTransitioning) {
+          for (let i = 0; i < particles.length; i++) {
+            if (particles[i].mode !== 'fractal') continue;
+            
+            for (let j = i + 1; j < particles.length; j++) {
+              if (particles[j].mode !== 'fractal') continue;
+              
+              const dx = particles[i].x - particles[j].x;
+              const dy = particles[i].y - particles[j].y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+    
+              if (distance < connectionDistance) {
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                // Line opacity fades based on distance (closer = more opaque).
+                ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / connectionDistance})`;
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+                ctx.closePath();
+              }
+            }
+          }
+        }
+  
+        // Draw interactive connection lines from cursor to nearby particles.
+        // Disabled during mode transitions to prevent visual artifacts.
+        // Line color matches the current theme color (gold or light blue).
+        if (!isTransitioning) {
+          particles.forEach((particle) => {
+            const dx = particle.x - cursor.x;
+            const dy = particle.y - cursor.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+    
+            if (distance < connectionDistance) {
+              ctx.beginPath();
+              ctx.moveTo(particle.x, particle.y);
+              ctx.lineTo(cursor.x, cursor.y);
+              // Brighter cursor connections with increased opacity multiplier (1.5x)
+              const brightness = Math.min(1, (1 - distance / connectionDistance) * 1.5);
+              ctx.strokeStyle = `rgba(${themeColorRGB.r}, ${themeColorRGB.g}, ${themeColorRGB.b}, ${brightness})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+              ctx.closePath();
+            }
+
+            particle.update();
+            particle.draw(ctx);
+          });
+        }
+        
+        // TRON mode: Handle hazard pellets and collisions
+        if (animationMode === 'tron') {
+          const now = Date.now();
+          
+          // Update and draw hazards
+          for (let i = hazards.length - 1; i >= 0; i--) {
+            const hazard = hazards[i];
+            hazard.update(speedMultiplier);
+            hazard.draw(ctx);
+            
+            // Remove dead hazards
+            if (!hazard.alive) {
+              hazards.splice(i, 1);
+              continue;
+            }
+            
+            // Skip collision detection if hazard is already exploding
+            if (hazard.isExploding) continue;
+            
+            // Check collisions with particles
+            for (let j = 0; j < particles.length; j++) {
+              const particle = particles[j];
+              
+              if (particle.isRespawning) continue;
+              
+              if (hazard.checkCollision(particle)) {
+                // Get particle color based on side
+                let particleColor;
+                if (particle.side === 'left') {
+                  particleColor = '210, 210, 220'; // Silver-white
+                } else if (particle.side === 'right') {
+                  particleColor = '255, 140, 0'; // Orange
+                } else if (particle.side === 'top') {
+                  particleColor = '255, 255, 0'; // Yellow
+                } else { // bottom
+                  particleColor = '0, 150, 255'; // Blue
+                }
+                
+                // Trigger explosion with particle color
+                hazard.explode(particleColor);
+                
+                // Mark particle for respawn
+                particle.isRespawning = true;
+                particle.respawnTime = now + 3000; // Respawn after 3 seconds
+                
+                // Clear the particle's tracer path
+                particle.tronTracerPath = [];
+                
+                break; // One explosion per hazard
+              }
+            }
+          }
+          
+          // Handle particle respawning
+          for (let i = 0; i < particles.length; i++) {
+            const particle = particles[i];
+            
+            if (particle.isRespawning && now >= particle.respawnTime) {
+              // Respawn particle on its original side
+              let x, y, direction;
+              
+              if (particle.side === 'left') {
+                x = Math.random() * (canvas.width * 0.05) + 5;
+                y = Math.random() * canvas.height * 0.9 + (canvas.height * 0.05);
+                direction = 0; // Move right
+              } else if (particle.side === 'right') {
+                x = canvas.width * 0.95 + Math.random() * (canvas.width * 0.05) - 5;
+                y = Math.random() * canvas.height * 0.9 + (canvas.height * 0.05);
+                direction = 2; // Move left
+              } else if (particle.side === 'top') {
+                x = Math.random() * canvas.width * 0.9 + (canvas.width * 0.05);
+                y = Math.random() * (canvas.height * 0.05) + 5;
+                direction = 1; // Move down
+              } else { // bottom
+                x = Math.random() * canvas.width * 0.9 + (canvas.width * 0.05);
+                y = canvas.height * 0.95 + Math.random() * (canvas.height * 0.05) - 5;
+                direction = 3; // Move up
+              }
+              
+              particle.x = x;
+              particle.y = y;
+              particle.direction = direction;
+              particle.isRespawning = false;
+              particle.tronTracerPath = [];
+            }
+          }
+        }
+  
+        // Schedule next frame for continuous animation.
+        requestAnimationFrame(animate);
+      };
+
+      /**
+       * "KASH" Text Hover Event Handlers
+       * Slows down particle animation to 5% speed on hover for visual emphasis.
+       */
+      if (innerKashText) {
+        innerKashText.addEventListener("mouseenter", () => {
+          targetSpeedMultiplier = 0.05; // Slow down to 5% speed.
+          speedTransitionRate = 0.02; // Elegant, slow transition.
+        });
+        
+        innerKashText.addEventListener("mouseleave", () => {
+          targetSpeedMultiplier = 1.0; // Return to normal speed.
+          speedTransitionRate = 0.03; // Elegant, slow transition.
+        });
+      }
+
+      /**
+       * Navigation Button Hover Event Handlers
+       * Accelerates particle animation to 200% speed on hover for dynamic visual feedback.
+       */
+      const navigationButtons = [
+        document.getElementById("allProjects"),
+        document.getElementById("allResearch"),
+        document.getElementById("allCourses")
+      ];
+
+      navigationButtons.forEach((button) => {
+        if (button && !button.disabled) {
+          button.addEventListener("mouseenter", () => {
+            targetSpeedMultiplier = 1.75; // Accelerate to 200% speed.
+            speedTransitionRate = 0.05; // Faster, more responsive transition.
+          });
+          
+          button.addEventListener("mouseleave", () => {
+            targetSpeedMultiplier = 1.0; // Return to normal speed.
+            speedTransitionRate = 0.06; // Faster, more responsive transition.
+          });
+        }
+      });
+
+      /**
+       * "KASH" Text Hover Event Handlers
+       * Tracks hover state to prevent effect-specific clicks when cursor is over mode switcher.
+       */
+      if (innerKashText) {
+        innerKashText.addEventListener("mouseenter", () => {
+          isHoveringKash = true;
+        });
+        
+        innerKashText.addEventListener("mouseleave", () => {
+          isHoveringKash = false;
+        });
+      }
+
+      /**
+       * Header Text Hover Event Handlers
+       * Tracks hover state to prevent effect-specific clicks when cursor is over any header text.
+       */
+      const headerNavBar = document.getElementById("headerNavBar");
+      if (headerNavBar) {
+        // Track hover over all clickable/interactive text elements in header
+        const headerTextElements = headerNavBar.querySelectorAll("a, button, li");
+        
+        headerTextElements.forEach((element) => {
+          element.addEventListener("mouseenter", () => {
+            isHoveringHeaderText = true;
+          });
+          
+          element.addEventListener("mouseleave", () => {
+            isHoveringHeaderText = false;
+          });
+        });
+      }
+
+      /**
+       * "KASH" Text Click Event Handler
+       * Cycles between fractal, orbiting, and sand field animation modes.
+       * 
+       * This handler:
+       * 1. Sets transition flag to prevent rendering glitches.
+       * 2. Updates all particle states individually before changing global state.
+       * 3. Smoothly transitions text color (light blue ↔️ gold ↔️ amber).
+       * 4. Syncs theme state with localStorage.
+       * 5. Clears transition flag after a brief delay.
+       */
+      if (innerKashText) {
+        innerKashText.addEventListener("click", () => {
+          // Prevent rendering connection lines during transition to avoid visual glitches.
+          isTransitioning = true;
+          
+          // Randomly select a mode different from the current one
+          const allModes = ['fractal', 'orbiting', 'sandfield', 'tron'];
+          const availableModes = allModes.filter(mode => mode !== animationMode);
+          const newMode = availableModes[Math.floor(Math.random() * availableModes.length)];
+          
+          orbitDirection = Math.random() < 0.5 ? 1 : -1; // Randomize new orbital direction.
+          starTargetOpacity = newMode === 'orbiting' ? 1 : 0;
+          
+          // Clear ripples when switching away from sandfield mode
+          if (animationMode === 'sandfield' && newMode !== 'sandfield') {
+            ripples.length = 0;
+          }
+          
+          // Handle particle count changes for sand field mode (10-12x particles)
+          if (newMode === 'sandfield' && animationMode !== 'sandfield') {
+            // Randomize wave direction when entering sand field mode
+            waveAngle = Math.random() * Math.PI * 2;
+            waveDirectionX = Math.cos(waveAngle);
+            waveDirectionY = Math.sin(waveAngle);
+            wavePerpX = -Math.sin(waveAngle);
+            wavePerpY = Math.cos(waveAngle);
+            
+            // Switching TO sandfield: add 9-11x more particles
+            const multiplier = 9 + Math.floor(Math.random() * 3); // Random 9-11 (for 10-12x total)
+            const particlesToAdd = baseParticleCount * multiplier;
+            for (let i = 0; i < particlesToAdd; i++) {
+              const x = Math.random() * canvas.width;
+              const y = Math.random() * canvas.height;
+              const vx = (Math.random() - 0.5) * 2;
+              const vy = (Math.random() - 0.5) * 2;
+              const particle = new Particle(x, y, vx, vy);
+              particle.mode = 'sandfield';
+              particles.push(particle);
+            }
+          } else if (animationMode === 'sandfield' && newMode !== 'sandfield') {
+            // Switching FROM sandfield: remove extra particles, keep only base count
+            particles.splice(baseParticleCount);
+          }
+          
+          // Handle TRON mode special particle count (multiples of 4 in range 4-60)
+          if (newMode === 'tron' && animationMode !== 'tron') {
+            // Remove all existing particles
+            particles.length = 0;
+            
+            // Create particles in multiples of 4 (range 4-80)
+            const totalTronParticles = (1 + Math.floor(Math.random() * 20)) * 4; // 4, 8, 12...80
+            const particlesPerSide = totalTronParticles / 4; // Split equally across 4 sides
+            
+            for (let i = 0; i < totalTronParticles; i++) {
+              let x, y, side, direction;
+              const sideIndex = i % particlesPerSide; // Position within this side's group
+              const stratification = (sideIndex / Math.max(1, particlesPerSide - 1)); // 0 to 1 spread
+              
+              if (i < particlesPerSide) {
+                // Left side: spawn stratified along left edge, move right
+                side = 'left';
+                x = Math.random() * (canvas.width * 0.05) + 5; // Narrow spawn zone
+                y = (stratification * canvas.height * 0.9) + (canvas.height * 0.05); // Spread vertically
+                direction = 0; // Move right
+              } else if (i < particlesPerSide * 2) {
+                // Right side: spawn stratified along right edge, move left
+                side = 'right';
+                x = canvas.width * 0.95 + Math.random() * (canvas.width * 0.05) - 5; // Narrow spawn zone
+                y = (stratification * canvas.height * 0.9) + (canvas.height * 0.05); // Spread vertically
+                direction = 2; // Move left
+              } else if (i < particlesPerSide * 3) {
+                // Top side: spawn stratified along top edge, move down
+                side = 'top';
+                x = (stratification * canvas.width * 0.9) + (canvas.width * 0.05); // Spread horizontally
+                y = Math.random() * (canvas.height * 0.05) + 5; // Narrow spawn zone
+                direction = 1; // Move down
+              } else {
+                // Bottom side: spawn stratified along bottom edge, move up
+                side = 'bottom';
+                x = (stratification * canvas.width * 0.9) + (canvas.width * 0.05); // Spread horizontally
+                y = canvas.height * 0.95 + Math.random() * (canvas.height * 0.05) - 5; // Narrow spawn zone
+                direction = 3; // Move up
+              }
+              
+              const particle = new Particle(x, y, 0, 0);
+              particle.side = side;
+              particle.direction = direction;
+              particle.mode = 'tron';
+              // Vary timing for direction changes so particles don't move in sync
+              particle.nextDirectionChange = Date.now() + Math.random() * 1000 + (sideIndex * 50);
+              particles.push(particle);
+            }
+          } else if (animationMode === 'tron' && newMode !== 'tron') {
+            // Switching FROM TRON: restore base particle count and clear hazards
+            particles.length = 0;
+            hazards.length = 0; // Clear all hazard pellets
+            for (let i = 0; i < baseParticleCount; i++) {
+              const x = Math.random() * canvas.width;
+              const y = Math.random() * canvas.height;
+              const vx = (Math.random() - 0.5) * 2;
+              const vy = (Math.random() - 0.5) * 2;
+              const particle = new Particle(x, y, vx, vy);
+              particle.mode = newMode;
+              particles.push(particle);
+            }
+          }
+          
+          // Update individual particle states BEFORE changing the global mode flag.
+          // This ensures consistent state across all particles during the transition.
+          particles.forEach((particle, index) => {
+            if (newMode === 'orbiting') {
+              // Switching to orbiting mode.
+              particle.tracerPath = []; // Clear any existing trail data.
+              const dx = particle.x - centerX;
+              const dy = particle.y - centerY;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              
+              // Recalculate orbital properties based on current particle position.
+              particle.orbitSpeed = Math.max(0.5, 200 / distance) * 0.015;
+              particle.orbitAngle = Math.atan2(dy, dx);
+              particle.orbitDirection = orbitDirection;
+              particle.orbitCenter = { x: centerX, y: centerY };
+              particle.mode = 'orbiting';
+            } else if (newMode === 'sandfield') {
+              // Switching to sand field mode - arrange in diagonal layers
+              particle.tracerPath = [];
+              
+              // Position particles in diagonal layers perpendicular to wave direction
+              // Wave goes from bottom-left to top-right, so layers go from bottom-right to top-left
+              const layerAngle = Math.PI / 4; // 45 degrees for diagonal
+              const layerSpacing = 50; // Distance between layers
+              const layerIndex = Math.floor(index / 10); // ~10 particles per layer
+              const positionInLayer = index % 10;
+              
+              // Base position along the diagonal layer
+              particle.baseX = (layerIndex * layerSpacing * Math.cos(layerAngle - Math.PI/2)) + 
+                              (positionInLayer * canvas.width / 10) + 
+                              (Math.random() - 0.5) * 30; // Slight randomness
+              particle.baseY = (layerIndex * layerSpacing * Math.sin(layerAngle - Math.PI/2)) + 
+                              (positionInLayer * canvas.height / 10) + 
+                              (Math.random() - 0.5) * 30; // Slight randomness
+              
+              // Wrap positions to canvas
+              particle.baseX = ((particle.baseX % canvas.width) + canvas.width) % canvas.width;
+              particle.baseY = ((particle.baseY % canvas.height) + canvas.height) % canvas.height;
+              
+              particle.x = particle.baseX;
+              particle.y = particle.baseY;
+              
+              // Calculate layer number based on perpendicular distance to wave direction
+              // Uses randomized perpendicular direction to maintain layer alignment
+              const layerPosition = (particle.baseX * wavePerpX + particle.baseY * wavePerpY) / Math.sqrt(wavePerpX * wavePerpX + wavePerpY * wavePerpY);
+              const layerNumber = Math.floor(layerPosition / 30); // 30px layer width
+              
+              // Synchronize phase for particles in same layer with slight randomness
+              particle.wavePhase = (layerNumber * 0.5) + (Math.random() - 0.5) * 0.2;
+              particle.mode = 'sandfield';
+            } else if (newMode === 'tron') {
+              // TRON mode particles are recreated, skip update
+              particle.mode = 'tron';
+            } else {
+              // Switching to fractal mode.
+              particle.tracerPath = [];
+              particle.mode = 'fractal';
+            }
+          });
+          
+          // Update global mode flag only after all particles have been configured.
+          animationMode = newMode;
+          
+          // Apply smooth color transition to "KASH" text via inline styles.
+          // The transition-all CSS property on the element handles the animation.
+          if (newMode === 'orbiting') {
+            innerKashText.style.color = "#D9BE4C"; // Gold for orbiting mode.
+            document.documentElement.style.setProperty('--theme-hover-color', '#D9BE4C'); // Update hover color globally.
+            themeColorRGB = { r: 217, g: 190, b: 76 }; // Update connection line color to gold.
+          } else if (newMode === 'sandfield') {
+            innerKashText.style.color = "#C4A574"; // Sandy beige for sand field mode.
+            document.documentElement.style.setProperty('--theme-hover-color', '#C4A574'); // Update hover color globally.
+            themeColorRGB = { r: 196, g: 165, b: 116 }; // Update connection line color to sandy beige.
+          } else if (newMode === 'tron') {
+            innerKashText.style.color = "#FF6B9D"; // Reddish-pink for TRON mode.
+            document.documentElement.style.setProperty('--theme-hover-color', '#FF6B9D'); // Update hover color globally.
+            themeColorRGB = { r: 255, g: 107, b: 157 }; // Update connection line color to reddish-pink.
+          } else {
+            innerKashText.style.color = "#bae6fd"; // Light blue for fractal mode.
+            document.documentElement.style.setProperty('--theme-hover-color', '#bae6fd'); // Update hover color globally.
+            themeColorRGB = { r: 186, g: 230, b: 253 }; // Update connection line color to light blue.
+          }
+          
+          // Synchronize theme class on document root and persist to localStorage.
+          targetTheme.classList.remove("fractals", "planets", "sandfield", "tron");
+          if (newMode === 'orbiting') {
+            targetTheme.classList.add("planets");
+            localStorage.setItem("theme", "planets");
+          } else if (newMode === 'sandfield') {
+            targetTheme.classList.add("sandfield");
+            localStorage.setItem("theme", "sandfield");
+          } else if (newMode === 'tron') {
+            targetTheme.classList.add("tron");
+            localStorage.setItem("theme", "tron");
+          } else {
+            targetTheme.classList.add("fractals");
+            localStorage.setItem("theme", "fractals");
+          }
+          
+          // Re-enable connection line rendering after a brief delay.
+          // This ensures all state changes have propagated before resuming normal rendering.
+          setTimeout(() => {
+            isTransitioning = false;
+          }, 100);
+        });
+      }
+  
+      // Initialize the animation loop and canvas resize handling.
+      animate();
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+    });
+    </script>
+  </>
+)}

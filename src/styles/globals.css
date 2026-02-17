@@ -1,0 +1,370 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Dynamic theme color variable that changes based on animation mode */
+:root {
+    --theme-hover-color: #D9BE4C; /* Default to gold */
+}
+
+/* Update theme color variable based on current theme class */
+html.planets {
+    --theme-hover-color: #D9BE4C; /* Gold for orbiting/planets mode */
+}
+
+html.fractals {
+    --theme-hover-color: #bae6fd; /* Light blue for fractal mode */
+}
+
+/* Set initial KASH text color based on theme class to prevent flash of white */
+html.planets #innerKashText {
+    color: #D9BE4C; /* Gold for orbiting/planets mode */
+}
+
+html.fractals #innerKashText {
+    color: #bae6fd; /* Light blue for fractal mode */
+}
+
+html,
+body {
+    overflow-x: hidden;
+    user-select: none; /* Prevent text selection/highlighting on double-click */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE/Edge */
+}
+
+h1,
+h2,
+p {
+    cursor: default;
+}
+
+#togglePhysicsBtn {
+    cursor: pointer;
+}
+
+#innerKashText {
+    cursor: pointer;
+    /* Change cursor to pointer for "KASH" */
+    transition: color 0.005s ease-in-out;
+    /* Smooth transition for color change */
+}
+
+#innerKashText:hover {
+    @apply hover:animate-pulse;
+}
+
+/* Dynamic hover color that matches current KASH text color */
+.dynamic-hover:hover {
+    color: var(--theme-hover-color) !important;
+}
+
+/* Dynamic background hover for buttons */
+.dynamic-hover-bg:hover {
+    background-color: var(--theme-hover-color) !important;
+}
+
+/* Dynamic background hover for logo and other circular elements */
+.dynamic-bg-hover {
+    transition: background-color 0.3s;
+}
+
+.dynamic-bg-hover:hover {
+    background-color: var(--theme-hover-color) !important;
+}
+
+.white-char {
+    cursor: default;
+    /* Ensure default cursor for white text */
+}
+
+.gold-to-white {
+    color: #FFFFFF !important;
+    /* Temporarily change "KASH" to white */
+}
+
+.white-to-gold {
+    color: #D9BE4C !important;
+    /* Transition "KASH" back to gold */
+    animation: spin 1s;
+}
+
+#carousel-container {
+    width: 100%;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 16px;
+    /* Add spacing between the cards */
+    transition: transform 0.3s ease-in-out;
+    will-change: transform;
+}
+
+.carousel-item {
+    width: 300px;
+    height: 400px;
+    background-color: #d4af37;
+    /* Dull gold */
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    flex-shrink: 0;
+    transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
+    border-radius: 8px;
+    /* Optional: Rounded corners */
+    overflow: hidden;
+    /* Ensure child content stays inside the card */
+}
+
+/* Hover Effects */
+.carousel-item:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+    /* Expand card size */
+    z-index: 10;
+    /* Bring hovered card to the foreground */
+}
+
+.carousel-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.carousel-item:hover .carousel-content {
+    opacity: 1;
+}
+
+/* Styling nav dots */
+.carousel {
+    padding-bottom: 60px;
+    position: relative;
+}
+
+.carousel__navdots {
+    bottom: 0;
+    column-gap: 16px;
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.carousel__navdots button {
+    /* reset default style */
+    -moz-appearance: none;
+    -webkit-apperance: none;
+    appearance: none;
+    border: 0;
+    cursor: pointer;
+    /* style as a grey dot */
+    background-color: #9a9a9a;
+    border-radius: 50%;
+    height: 10px;
+    padding: 0;
+    width: 10px;
+}
+
+.carousel__navdots button.is-active {
+    background-color: #0060a8;
+    /* blue */
+}
+
+.carousel__navdots button:focus-visible {
+    outline: 2px solid #0060a8;
+    /* blue */
+    outline-offset: 2px;
+}
+
+/* Stylistic purpose */
+.carousel-wrapper {
+    align-items: center;
+    display: flex;
+    height: 100vh;
+    padding: 0 200px;
+}
+
+.carousel {
+    margin: 0 auto;
+}
+
+
+
+#btnGitHub {
+    @apply w-10 h-10 flex items-center justify-center opacity-90 hover:opacity-100 bg-white rounded-full text-gray-800 transition-all duration-300 hover:text-white hover:bg-black shadow-md;
+}
+
+#btnLinkedIn {
+    @apply w-10 h-10 flex items-center justify-center opacity-90 hover:opacity-100 bg-white rounded-full text-blue-500 transition-all duration-300 hover:text-white hover:bg-blue-500 shadow-md;
+}
+
+#btnResume {
+    @apply w-10 h-10 flex items-center justify-center opacity-90 hover:opacity-100 bg-white rounded-full text-blue-900 transition-all duration-300 hover:text-white hover:bg-blue-900 shadow-md;
+}
+
+#btnCodeberg {
+    @apply w-10 h-10 flex items-center justify-center opacity-90 hover:opacity-100 bg-white rounded-full text-blue-700 transition-all duration-300 hover:text-white hover:bg-blue-700 shadow-md;
+}
+
+#btnEmail {
+    @apply w-10 h-10 flex items-center justify-center opacity-90 hover:opacity-100 bg-white rounded-full text-gray-400 transition-all duration-300 hover:text-white hover:bg-gray-400 shadow-md;
+}
+
+@layer utilities {
+
+    /* Glitch animation for white letters */
+    @keyframes glitch {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: translate(0, 0);
+        }
+
+        10% {
+            transform: translate(-2px, -2px);
+            content: "3";
+        }
+
+        20% {
+            transform: translate(2px, 2px);
+            content: "Z";
+        }
+
+        30% {
+            transform: translate(-1px, 1px);
+            content: "4";
+        }
+
+        40% {
+            content: "M";
+        }
+
+        50% {
+            content: attr(data-glitch);
+        }
+    }
+
+    /* Fade-out animation for white text */
+    @keyframes fade-out {
+        to {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+    }
+
+    /* Fade-in animation to reverse the effect */
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* Utility classes */
+    .glitch {
+        animation: glitch 0.5s steps(2) infinite;
+    }
+
+    .fade-out {
+        animation: fade-out 0.01s forwards;
+    }
+
+    .fade-in {
+        animation: fade-in 0.4s forwards;
+    }
+
+    /* Footer Button Hover Animations */
+    /* GitHub button: black/gray theme */
+    .footer-btn-github {
+        @apply w-8 h-8 rounded-full bg-white flex items-center justify-center transition-all duration-300;
+    }
+    .footer-btn-github:hover {
+        @apply bg-gray-800;
+    }
+    .footer-btn-github svg {
+        @apply w-5 h-5 text-gray-800 transition-colors duration-300;
+    }
+    .footer-btn-github:hover svg {
+        @apply text-white;
+    }
+
+    /* Codeberg button: darker blue theme */
+    .footer-btn-codeberg {
+        @apply w-8 h-8 rounded-full bg-white flex items-center justify-center transition-all duration-300;
+    }
+    .footer-btn-codeberg:hover {
+        @apply bg-blue-700;
+    }
+    .footer-btn-codeberg svg {
+        @apply w-5 h-5 text-blue-700 transition-colors duration-300;
+    }
+    .footer-btn-codeberg:hover svg {
+        @apply text-white;
+    }
+
+    /* LinkedIn button: blue theme */
+    .footer-btn-linkedin {
+        @apply w-8 h-8 rounded-full bg-white flex items-center justify-center transition-all duration-300;
+    }
+    .footer-btn-linkedin:hover {
+        @apply bg-blue-600;
+    }
+    .footer-btn-linkedin svg {
+        @apply w-5 h-5 text-blue-600 transition-colors duration-300;
+    }
+    .footer-btn-linkedin:hover svg {
+        @apply text-white;
+    }
+
+    /* Resume button: light purple theme */
+    .footer-btn-resume {
+        @apply w-8 h-8 rounded-full bg-white flex items-center justify-center transition-all duration-300;
+    }
+    .footer-btn-resume:hover {
+        background-color: #c084fc !important; /* purple-400 for more vibrant purple */
+    }
+    .footer-btn-resume svg {
+        @apply w-5 h-5 transition-colors duration-300;
+        color: #c084fc; /* purple-400 to match hover */
+    }
+    .footer-btn-resume:hover svg {
+        @apply text-white;
+    }
+
+    /* Email button: light silver/gray theme */
+    .footer-btn-email {
+        @apply w-8 h-8 rounded-full bg-white flex items-center justify-center transition-all duration-300;
+    }
+    .footer-btn-email:hover {
+        @apply bg-gray-400;
+    }
+    .footer-btn-email svg {
+        @apply w-5 h-5 text-gray-500 transition-colors duration-300;
+    }
+    .footer-btn-email:hover svg {
+        @apply text-white;
+    }
+}

@@ -1,0 +1,79 @@
+---
+// Homepage - Landing page with interactive name display and animated background.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import DynamicGeometry from "../components/DynamicGeometry.astro";
+---
+
+<BaseLayout
+	title="Aakash Sudhakar"
+	description="Understanding the world and human expression through code and communication."
+	type="website"
+>
+	<div id="home" class="w-full md:-mb-10">
+		<section
+			id="home-page"
+			class="bg-silver dark:bg-silver text-pearl dark:text-pearl m-5 flex flex-col items-center justify-center space-y-6"
+		>
+			<!-- Dynamic particle animation background (fractal or orbiting mode) -->
+			<DynamicGeometry />
+
+			<div
+				class="h-screen text-white flex flex-col items-center justify-center space-y-6"
+			>
+				<!-- 
+					Main title with interactive "KASH" text.
+					Clicking "KASH" toggles the background animation mode and text color.
+				-->
+				<h1
+					id="glitch-title"
+					class="text-5xl font-bold text-center md:text-7xl lg:text-8xl relative z-20 max-w-2xl"
+				>
+					<span id="outerKashText" class="text-pearl">
+						<!-- 
+							Interactive "KASH" text that controls background animation mode.
+							Color transitions between light blue (fractal) and gold (orbiting).
+						-->
+						<span
+							id="innerKashText"
+							class="glitch-char cursor-pointer hover:opacity-80 transition-all duration-300"
+							data-type="gold">KASH</span
+						>
+						<br />
+						<span
+							id="suffixGlitchedText"
+							class="glitch-char white-char"
+							data-type="static">SUDHAKAR</span
+						>
+					</span>
+				</h1>
+
+				<!-- Navigation buttons for quick access to main sections -->
+				<div class="flex space-x-4 relative z-20">
+					<a id="directLinkToProjects" href="/projects/">
+						<button
+							id="allProjects"
+							class="px-3 py-2 text-lg font-semibold bg-pearl text-silver rounded-lg dynamic-hover-bg hover:text-pearl transition"
+						>
+							Projects
+						</button>
+					</a>
+					<button
+						id="allResearch"
+						class="px-3 py-2 text-lg font-semibold bg-gray-400 text-gray-600 rounded-lg cursor-not-allowed line-through"
+						disabled
+					>
+						Research
+					</button>
+					<button
+						id="allCourses"
+						class="px-3 py-2 text-lg font-semibold bg-gray-400 text-gray-600 rounded-lg cursor-not-allowed line-through"
+						disabled
+					>
+						Courses
+					</button>
+				</div>
+			</div>
+		</section>
+	</div>
+</BaseLayout>
+

@@ -1,0 +1,552 @@
+---
+/**
+ * Page Header Component
+ * 
+ * Provides the main navigation bar with logo, page routing links, and responsive burger menu.
+ * Supports both desktop (horizontal nav bar) and mobile (collapsible burger menu) layouts.
+ * Highlights the current active page in the navigation based on the URL pathname.
+ */
+
+// Capture the current URL pathname to determine which navigation link should be highlighted.
+const currentPath = new URL(Astro.request.url).pathname;
+console.log(currentPath);
+---
+
+<!-- 
+  Navigation Bar Container (Desktop Layout)
+  Rendered by default on large windows with horizontal layout and full navigation options.
+-->
+<nav
+    id="headerNavBar"
+    class="nav relative z-20 px-4 py-4 flex justify-between items-center"
+>
+    <!-- Clickable Logo on Header that Routes Back to Home Page -->
+    <a class="text-3xl font-bold leading-none focus:outline-none" href="/" title="Back to Home" style="-webkit-tap-highlight-color: transparent;">
+        <div class="relative w-[64px] h-[64px] duration-300 overflow-hidden opacity-80">
+            <!-- Background circle that transitions to dynamic theme color on hover -->
+            <div
+                class="absolute inset-0 bg-pearl dynamic-bg-hover rounded-full"
+            >
+            </div>
+
+            <!-- 
+              Static logo image displaying the left portion of the combined logo.
+              No hover effect - remains consistent across all states.
+              Starts with silver background and fades in once image is loaded.
+            -->
+            <div
+                id="desktopLogoImage"
+                class="absolute inset-0 bg-no-repeat bg-left bg-cover opacity-0 transition-opacity duration-300"
+                style="background-color: #3C454D; background-image: url('https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/DJPKLogos_Pl&AuCombinedOnAg_Revised.png'); background-size: 200%;"
+            >
+            </div>
+        </div>
+    </a>
+
+    <!-- 
+      Legacy Toggle Button (Deprecated)
+      Previously used for theme/animation switching, now replaced by the clickable "KASH" text.
+      Kept in codebase for potential future re-enablement.
+    -->
+    <!-- <div class="flex space-x-4 right-14 relative z-20">
+        <button id="togglePhysicsBtn" class="px-3 py-2 text-sm font-semibold bg-pearl text-pearl rounded-full hover:bg-red-400 hover:text-pearl transition">
+            <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M20 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6h-2m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4"/>
+            </svg>													
+        </button>
+    </div> -->
+
+    <!-- 
+      Burger Menu Toggle Button (Mobile Only)
+      Displayed only on small screens to access the collapsible navigation menu.
+      Hidden by default on larger viewport sizes where the full nav bar is visible.
+    -->
+    <div class="lg:hidden">
+        <button
+            class="navbar-burger flex items-center text-pearl dark:text-pearl p-3"
+        >
+            <svg
+                class="block h-4 w-4 fill-current"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <title>Navigational Menu</title>
+                <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- 
+      Main Navigation Links (Desktop Layout)
+      Horizontal list of page routes with active state highlighting and hover effects.
+      Hidden on mobile devices; accessible through burger menu instead.
+    -->
+    <ul
+        class="hidden absolute top-[64px] left-[100px] transform -translate-y-1/2 lg:flex lg:mx-auto lg:items-center lg:justify-start lg:w-auto lg:space-x-2 font-code"
+    >
+        <!-- 
+          Home Navigation Link (Currently Disabled)
+          Removed from active navigation since logo already serves as home link.
+        -->
+        <!-- <li>
+            <a class=`${(currentPath==="/") && "navIsActive"} hover:text-gold` id="homePage" href="/">home</a>
+        </li>
+        <li class="text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" class="w-4 h-4 current-fill" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v0m0 7v0m0 7v0m0-13a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+            </svg>
+        </li> -->
+
+        <!-- About Me page navigation link with active state detection -->
+        <li>
+            <a
+                class=`${(currentPath==="/about/") && "navIsActive"} dynamic-hover`
+                id="aboutPage"
+                href="/about/">about me</a
+            >
+        </li>
+        <!-- Visual separator dot between navigation items -->
+        <li class="text-gray-300">
+            <svg
+                class="w-4 h-4 current-fill"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 5v0m0 7v0m0 7v0m0-13a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                ></path>
+            </svg>
+        </li>
+
+        <!-- Initiatives side-expanding menu -->
+        <li class="relative">
+            <button
+                class=`${(currentPath==="/projects/") && "navIsActive"} dynamic-hover flex items-center cursor-pointer`
+                id="initiativesToggle"
+            >
+                initiatives
+                <svg class="w-4 h-4 ml-1 transition-transform duration-200" id="initiativesArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+            
+            <!-- Side-expanding menu with circular icons -->
+            <div class="absolute left-full ml-4 top-1/2 -translate-y-1/2 hidden" id="initiativesSidebar" style="z-index: 9999;">
+                <div class="flex items-center gap-3 bg-silver dark:bg-silver rounded-full px-3 py-2 shadow-lg">
+                    <!-- Projects icon/button -->
+                    <a
+                        class=`${(currentPath==="/projects/") && "navIsActive"} initiative-icon flex items-center justify-center bg-pearl rounded-full transition-all duration-300 cursor-pointer dynamic-hover`
+                        href="/projects/"
+                        data-label="projects"
+                        style="width: 40px; height: 40px; overflow: hidden;"
+                    >
+                        <span class="font-bold text-silver dark:text-silver" style="white-space: nowrap;">p</span>
+                    </a>
+                    
+                    <!-- Research icon/button (disabled) -->
+                    <span
+                        class="initiative-icon flex items-center justify-center bg-gray-400 rounded-full transition-all duration-300 cursor-not-allowed opacity-50"
+                        data-label="research"
+                        style="width: 40px; height: 40px; overflow: hidden;"
+                    >
+                        <span class="font-bold text-silver dark:text-silver line-through" style="white-space: nowrap;">r</span>
+                    </span>
+                    
+                    <!-- Teaching icon/button (disabled) -->
+                    <span
+                        class="initiative-icon flex items-center justify-center bg-gray-400 rounded-full transition-all duration-300 cursor-not-allowed opacity-50"
+                        data-label="teaching"
+                        style="width: 40px; height: 40px; overflow: hidden;"
+                    >
+                        <span class="font-bold text-silver dark:text-silver line-through" style="white-space: nowrap;">t</span>
+                    </span>
+                    
+                    <!-- Advocacy icon/button (disabled) -->
+                    <span
+                        class="initiative-icon flex items-center justify-center bg-gray-400 rounded-full transition-all duration-300 cursor-not-allowed opacity-50"
+                        data-label="advocacy"
+                        style="width: 40px; height: 40px; overflow: hidden;"
+                    >
+                        <span class="font-bold text-silver dark:text-silver line-through" style="white-space: nowrap;">a</span>
+                    </span>
+                </div>
+            </div>
+        </li>        <!-- 
+          Final separator dot (currently disabled)
+          No additional navigation links follow, so separator is not needed.
+        -->        <!-- <li class="text-gray-300">
+            <svg
+                class="w-4 h-4 current-fill"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 5v0m0 7v0m0 7v0m0-13a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                ></path>
+            </svg>
+        </li> -->
+
+        <!-- 
+          Interests Navigation Link (Currently Disabled)
+          Interests page exists but is hidden from main navigation at this time.
+        -->
+        <!-- <li>
+            <a
+                class=`${(currentPath==="/interests/") && "navIsActive"} hover:text-gold`
+                id="interestsPage"
+                href="/interests/">interests</a
+            >
+        </li> -->
+    </ul>
+</nav>
+
+<!-- 
+  Burger Menu Container (Mobile Navigation)
+  Expandable overlay menu that slides in from the left on mobile devices.
+  Hidden by default; toggled visible when burger icon is clicked.
+-->
+<div
+    id="containerNavBarBurgerMenu"
+    class="nav navbar-menu relative z-50 hidden"
+>
+    <!-- Semi-transparent backdrop overlay that closes menu when clicked -->
+    <div class="navbar-backdrop fixed inset-0 bg-gray-800 opacity-25"></div>
+    
+    <!-- Slide-out navigation panel with logo, links, and close button -->
+    <nav
+        id="headerBurgerMenuOnAppear"
+        class="fixed top-0 left-0 bottom-0 flex flex-col w-5/6 max-w-sm py-6 px-6 bg-black overflow-y-auto"
+    >
+        <div class="flex items-center mb-8">
+            <!-- 
+              Logo in burger menu header.
+              Provides consistent branding and home navigation within mobile menu.
+              Static display with no hover animation effect.
+            -->
+            <a class="mr-auto text-3xl font-bold leading-none focus:outline-none" href="/" style="-webkit-tap-highlight-color: transparent;">
+                <div
+                    class="relative w-[84px] h-[84px] duration-300 overflow-hidden"
+                >
+                    <!-- Background element for logo container -->
+                    <div
+                        class="absolute inset-0 transition-colors duration-300"
+                    >
+                    </div>
+
+                    <!-- 
+                      Static logo image displaying the left portion of the combined logo.
+                      Uses black background variant for visibility against dark menu.
+                      No hover effect - remains consistent across all states.
+                      Starts with black background and fades in once image is loaded.
+                    -->
+                    <div
+                        id="mobileLogoImage"
+                        class="absolute inset-0 bg-no-repeat bg-left bg-cover rounded-full opacity-0 transition-opacity duration-300"
+                        style="background-color: #000000; background-image: url('https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/DJPKLogos_Pl&AuCombinedOnBl_Revised.png'); background-size: 200%;"
+                    >
+                    </div>
+                </div>
+            </a>
+
+            <!-- 
+              Close Button (X Icon)
+              Collapses and hides the burger menu when clicked.
+            -->
+            <button class="navbar-close">
+                <svg
+                    class="h-6 w-6 text-gray-400 cursor-pointer hover:text-gray-500"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- 
+          Navigation Links List (Mobile Menu)
+          Vertical stacked layout with larger touch-friendly targets and active state highlighting.
+        -->
+        <div class="font-code text-2xl text-pearl">
+            <ul>
+                <!-- 
+                  Home Link (Currently Disabled)
+                  Removed since logo already provides home navigation.
+                -->
+                <!-- <li class="mb-1">
+                    <a class=`${(currentPath==="/") && "navIsActiveMobile"} block p-4 font-semibold hover:bg-gray-50 hover:text-gold` href="/">home</a>
+                </li> -->
+
+                <!-- About Me page link with mobile-specific active state styling -->
+                <li class="mb-1">
+                    <a
+                        class=`${(currentPath==="/about/") && "navIsActiveMobile"} block p-4 font-semibold hover:bg-gray-50 dynamic-hover`
+                        href="/about/">about me</a
+                    >
+                </li>
+
+                <!-- Initiatives dropdown section for mobile -->
+                <li class="mb-1">
+                    <button
+                        class=`${(currentPath==="/projects/") && "navIsActiveMobile"} block w-full text-left p-4 font-semibold hover:bg-gray-50 dynamic-hover mobile-dropdown-toggle`
+                        id="mobileInitiativesToggle"
+                    >
+                        initiatives
+                        <svg class="w-4 h-4 inline-block ml-1 transition-transform duration-200" id="mobileDropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- Submenu items -->
+                    <div class="hidden pl-4" id="mobileInitiativesSubmenu">
+                        <a
+                            class=`${(currentPath==="/projects/") && "navIsActiveMobile"} block p-4 font-semibold hover:bg-gray-50 dynamic-hover`
+                            href="/projects/">projects</a
+                        >
+                        <span
+                            class="block p-4 font-semibold text-gray-400 line-through cursor-not-allowed"
+                        >research</span
+                        >
+                        <span
+                            class="block p-4 font-semibold text-gray-400 line-through cursor-not-allowed"
+                        >teaching</span
+                        >
+                        <span
+                            class="block p-4 font-semibold text-gray-400 line-through cursor-not-allowed"
+                        >advocacy</span
+                        >
+                    </div>
+                </li>
+
+                <!-- 
+                  Interests Link (Currently Disabled)
+                  Interests page hidden from mobile navigation at this time.
+                -->
+                <!-- <li class="mb-1">
+                    <a
+                        class=`${(currentPath==="/interests/") && "navIsActiveMobile"} block p-4 font-semibold hover:bg-gray-50 hover:text-gold`
+                        href="/interests/">interests</a
+                    >
+                </li> -->
+            </ul>
+        </div>
+
+        <!-- 
+          Footer Section in Burger Menu
+          Displays a friendly closing message at the bottom of the navigation panel.
+        -->
+        <div class="mt-auto">
+            <div class="pt-6"></div>
+            <p class="my-4 text-xs text-center text-pearl">
+                <span>Made with love. 💛</span>
+            </p>
+        </div>
+    </nav>
+</div>
+
+<script is:inline>
+    /**
+     * Logo Image Preload Handler
+     * 
+     * Ensures logo images are fully loaded before displaying them to prevent white flash.
+     * Fades in logos with smooth opacity transition once images are ready.
+     */
+    
+    // Preload desktop logo image
+    const desktopLogoImg = new Image();
+    desktopLogoImg.src = 'https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/DJPKLogos_Pl&AuCombinedOnAg_Revised.png';
+    desktopLogoImg.onload = () => {
+        const logoElement = document.getElementById('desktopLogoImage');
+        if (logoElement) {
+            logoElement.style.opacity = '1';
+        }
+    };
+
+    // Preload mobile logo image
+    const mobileLogoImg = new Image();
+    mobileLogoImg.src = 'https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/DJPKLogos_Pl&AuCombinedOnBl_Revised.png';
+    mobileLogoImg.onload = () => {
+        const logoElement = document.getElementById('mobileLogoImage');
+        if (logoElement) {
+            logoElement.style.opacity = '1';
+        }
+    };
+
+    /**
+     * Burger Menu Interaction Handler
+     * 
+     * Manages the open/close behavior of the mobile navigation menu.
+     * Responds to clicks on the burger icon, close button, and backdrop overlay.
+     */
+    
+    // DOM element references for burger menu components.
+    const elementBurger = document.querySelector(".navbar-burger");
+    const elementMenu = document.querySelector(".navbar-menu");
+    const elementMenuCloseButton = document.querySelector(".navbar-close");
+    const elementMenuBackdrop = document.querySelector(".navbar-backdrop");
+
+    /**
+     * Toggles the visibility state of the burger menu.
+     * Adds or removes the 'hidden' class to show/hide the navigation panel.
+     */
+    const closeMenu = () => {
+        elementMenu.classList.toggle("hidden");
+    };
+
+    // Toggle menu visibility when burger icon is clicked.
+    elementBurger.addEventListener("click", () => {
+        closeMenu();
+    });
+
+    // Close menu when the X button is clicked.
+    elementMenuCloseButton.addEventListener("click", () => {
+        closeMenu();
+    });
+
+    // Close menu when clicking outside the navigation panel on the backdrop overlay.
+    elementMenuBackdrop.addEventListener("click", () => {
+        closeMenu();
+    });
+
+    /**
+     * Mobile Initiatives Dropdown Handler
+     * 
+     * Manages the expand/collapse behavior of the initiatives submenu in mobile view.
+     */
+    const mobileInitiativesToggle = document.getElementById("mobileInitiativesToggle");
+    const mobileInitiativesSubmenu = document.getElementById("mobileInitiativesSubmenu");
+    const mobileDropdownArrow = document.getElementById("mobileDropdownArrow");
+
+    if (mobileInitiativesToggle && mobileInitiativesSubmenu) {
+        // Check if we're on the projects page and auto-expand if so
+        const currentPath = window.location.pathname;
+        
+        if (currentPath === '/projects/') {
+            mobileInitiativesSubmenu.classList.remove("hidden");
+            if (mobileDropdownArrow) {
+                mobileDropdownArrow.style.transform = "rotate(180deg)";
+            }
+        }
+        
+        mobileInitiativesToggle.addEventListener("click", () => {
+            mobileInitiativesSubmenu.classList.toggle("hidden");
+            
+            // Rotate arrow icon when dropdown is open
+            if (mobileDropdownArrow) {
+                mobileDropdownArrow.style.transform = mobileInitiativesSubmenu.classList.contains("hidden") 
+                    ? "rotate(0deg)" 
+                    : "rotate(180deg)";
+            }
+        });
+    }
+
+    /**
+     * Desktop Initiatives Sidebar Handler
+     * 
+     * Manages the toggle and expansion behavior of the initiatives sidebar in desktop view.
+     */
+    const initiativesToggle = document.getElementById("initiativesToggle");
+    const initiativesSidebar = document.getElementById("initiativesSidebar");
+    const initiativesArrow = document.getElementById("initiativesArrow");
+
+    if (initiativesToggle && initiativesSidebar) {
+        // Auto-show sidebar if on projects page
+        const currentPath = window.location.pathname;
+        if (currentPath === '/projects/') {
+            initiativesSidebar.classList.remove("hidden");
+            if (initiativesArrow) {
+                initiativesArrow.style.transform = "rotate(180deg)";
+            }
+        }
+        
+        // Toggle sidebar visibility on click
+        initiativesToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const isHidden = initiativesSidebar.classList.contains("hidden");
+            
+            if (isHidden) {
+                initiativesSidebar.classList.remove("hidden");
+                if (initiativesArrow) {
+                    initiativesArrow.style.transform = "rotate(180deg)";
+                }
+            } else {
+                initiativesSidebar.classList.add("hidden");
+                if (initiativesArrow) {
+                    initiativesArrow.style.transform = "rotate(0deg)";
+                }
+            }
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener("click", (e) => {
+            if (!initiativesToggle.contains(e.target) && !initiativesSidebar.contains(e.target)) {
+                initiativesSidebar.classList.add("hidden");
+                if (initiativesArrow) {
+                    initiativesArrow.style.transform = "rotate(0deg)";
+                }
+            }
+        });
+
+        // Handle icon expansion on hover with persistent state
+        const initiativeIcons = document.querySelectorAll(".initiative-icon");
+        let currentlyExpandedIcon = null;
+        
+        initiativeIcons.forEach((icon) => {
+            const label = icon.getAttribute("data-label");
+            const textSpan = icon.querySelector("span");
+            const originalText = textSpan.textContent;
+            
+            // Store original text for each icon
+            icon.dataset.originalText = originalText;
+            icon.dataset.label = label;
+            
+            icon.addEventListener("mouseenter", () => {
+                // Collapse previously expanded icon if different
+                if (currentlyExpandedIcon && currentlyExpandedIcon !== icon) {
+                    const prevTextSpan = currentlyExpandedIcon.querySelector("span");
+                    currentlyExpandedIcon.style.width = "40px";
+                    currentlyExpandedIcon.style.paddingLeft = "0px";
+                    currentlyExpandedIcon.style.paddingRight = "0px";
+                    prevTextSpan.textContent = currentlyExpandedIcon.dataset.originalText;
+                }
+                
+                // Expand current icon
+                icon.style.width = "150px";
+                icon.style.paddingLeft = "12px";
+                icon.style.paddingRight = "12px";
+                textSpan.textContent = label;
+                currentlyExpandedIcon = icon;
+            });
+        });
+        
+        // Collapse expanded icon when leaving the sidebar entirely
+        if (initiativesSidebar) {
+            initiativesSidebar.addEventListener("mouseleave", () => {
+                if (currentlyExpandedIcon) {
+                    const textSpan = currentlyExpandedIcon.querySelector("span");
+                    currentlyExpandedIcon.style.width = "40px";
+                    currentlyExpandedIcon.style.paddingLeft = "0px";
+                    currentlyExpandedIcon.style.paddingRight = "0px";
+                    textSpan.textContent = currentlyExpandedIcon.dataset.originalText;
+                    currentlyExpandedIcon = null;
+                }
+            });
+        }
+    }
+</script>

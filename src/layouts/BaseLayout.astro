@@ -1,0 +1,369 @@
+---
+/**
+ * Base Layout Component
+ * 
+ * Provides the foundational HTML structure and shared elements for all pages.
+ * Includes metadata configuration, external library loading (fonts, GSAP, Lenis),
+ * global component integration (header, footer, theme), and smooth scrolling setup.
+ * 
+ * Props:
+ * - title: Page title for SEO and Open Graph metadata
+ * - description: Page description for SEO and social media sharing
+ * - type: Open Graph content type (e.g., "website", "article")
+ */
+
+import PageHeader from "../components/PageHeader.astro";
+import PageFooter from "../components/PageFooter.astro";
+import PageTheme from "../components/PageTheme.astro";
+import "../styles/globals.css";
+
+// TypeScript interface defining required page metadata props.
+interface Props {
+    title: string;
+    description: string;
+    type: string;
+}
+
+// Destructure page-specific metadata from component props.
+const { title } = Astro.props;
+const { description } = Astro.props;
+const { type } = Astro.props;
+
+// Construct the full page URL for Open Graph metadata.
+const pageUrl = `https://kash.fyi${Astro.url.pathname}`;
+---
+
+<!doctype html>
+<html class="{theme || 'dark'} overflow-x-hidden">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+        <!-- Page title displayed in browser tab -->
+        <title>DJ Professor Kash</title>
+
+        <!-- 
+          Open Graph Metadata Configuration
+          Enables rich social media previews when the page is shared on platforms like
+          Facebook, LinkedIn, and Twitter.
+        -->
+        <meta property="og:type" content={type} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+
+        <!-- 
+          Preload Logo Images
+          Ensures logo images are loaded before rendering to prevent white flash on page load.
+        -->
+        <link
+            rel="preload"
+            as="image"
+            href="https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/DJPKLogos_Pl&AuCombinedOnAg_Revised.png"
+        />
+        <link
+            rel="preload"
+            as="image"
+            href="https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/DJPKLogos_Pl&AuCombinedOnBl_Revised.png"
+        />
+
+        <!-- 
+          Preconnect to External Font APIs
+          Establishes early connections to Google Fonts servers for faster font loading.
+        -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <!-- Load Font Libraries from External Stylesheet APIs -->
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap"
+        />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/lenis@1.1.13/dist/lenis.css"
+        />
+
+        <!-- 
+          GSAP Animation Libraries
+          Loads the GreenSock Animation Platform (GSAP) core library and plugins:
+          - Flip: For smooth state-based animations
+          - ScrollTrigger: For scroll-based animation triggers
+          - ScrollToPlugin: For smooth programmatic scrolling
+          Also includes Lenis for buttery smooth scroll physics.
+        -->
+        <script
+            is:inline
+            src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"
+        ></script>
+        <script
+            is:inline
+            src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js"
+        ></script>
+        <script
+            is:inline
+            src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"
+        ></script>
+        <script
+            is:inline
+            src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollToPlugin.min.js"
+        ></script>
+        <script is:inline src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"
+        ></script>
+    </head>
+
+    <body
+        class="top bg-silver dark:bg-silver text-pearl dark:text-pearl w-full font-poppins overflow-y-scroll overflow-x-hidden relative"
+    >
+        <!-- 
+          Back to Top Button
+          Fixed position button that appears after scrolling down 50% of viewport height.
+          Smoothly scrolls back to the top of the page when clicked.
+        -->
+        <div
+            id="backToTop"
+            class="text-3xl md:text-4xl fixed left-1/2 -translate-x-1/2 bottom-4 md:bottom-8 z-50 active:animate-ping"
+        >
+            <a href="#top">
+                <i
+                    class="fa-solid fa-circle-arrow-up text-pearl dark:text-white dynamic-hover"
+                ></i>
+            </a>
+        </div>
+
+        <!-- Page Transition Overlay -->
+        <div id="page-transition-overlay" class="fixed inset-0 bg-pearl z-[9999] pointer-events-none transition-opacity duration-500 flex items-center justify-center" style="opacity: 1;">
+            <!-- Newton's Cradle Animation -->
+            <div class="newtons-cradle">
+                <div class="cradle-dot cradle-dot-1"></div>
+                <div class="cradle-dot cradle-dot-2"></div>
+                <div class="cradle-dot cradle-dot-3"></div>
+                <div class="cradle-dot cradle-dot-4"></div>
+            </div>
+        </div>
+
+        <!-- 
+          Global Component Integration
+          - PageTheme: Manages animation state and theme initialization
+          - PageHeader: Navigation bar with routing links and burger menu
+          - <slot />: Placeholder for page-specific content
+          - PageFooter: Social links and thank you message
+        -->
+        <PageTheme />
+        <PageHeader />
+        <slot />
+        <PageFooter />
+    </body>
+</html>
+
+<style>
+    /* Newton's Cradle Animation */
+    .newtons-cradle {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .cradle-dot {
+        width: 12px;
+        height: 12px;
+        background-color: #1a1a1a;
+        border-radius: 50%;
+        position: relative;
+        opacity: 1;
+    }
+
+    /* Compression animation when navigating away */
+    .compressing .cradle-dot-1, .compressing .cradle-dot-2 {
+        animation: fadeInFromLeft 0.4s ease-out forwards;
+    }
+
+    .compressing .cradle-dot-3, .compressing .cradle-dot-4 {
+        animation: fadeInFromRight 0.4s ease-out forwards;
+    }
+
+    /* Override with loading animation when loading class is present */
+    .loading .cradle-dot-1 {
+        animation: swingLeft 0.8s ease-in-out infinite;
+        opacity: 1;
+    }
+
+    .loading .cradle-dot-2, .loading .cradle-dot-3 {
+        animation: none;
+        opacity: 1;
+    }
+
+    .loading .cradle-dot-4 {
+        animation: swingRight 0.8s ease-in-out infinite;
+        opacity: 1;
+    }
+
+    @keyframes fadeInFromLeft {
+        0% {
+            opacity: 0;
+            transform: translateX(-40px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes fadeInFromRight {
+        0% {
+            opacity: 0;
+            transform: translateX(40px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes swingLeft {
+        0% {
+            transform: translateX(-16px) rotate(-30deg);
+        }
+        25% {
+            transform: translateX(0) rotate(0deg);
+        }
+        25%, 75% {
+            transform: translateX(0) rotate(0deg);
+        }
+        100% {
+            transform: translateX(-16px) rotate(-30deg);
+        }
+    }
+
+    @keyframes swingRight {
+        0%, 25% {
+            transform: translateX(0) rotate(0deg);
+        }
+        50% {
+            transform: translateX(16px) rotate(30deg);
+        }
+        75% {
+            transform: translateX(0) rotate(0deg);
+        }
+        75%, 100% {
+            transform: translateX(0) rotate(0deg);
+        }
+    }
+</style>
+
+<script is:inline>
+    /**
+     * Global Animation and Scroll Initialization
+     * 
+     * Sets up GSAP plugins and Lenis smooth scrolling for the entire site.
+     * Also manages the visibility of the "back to top" button based on scroll position.
+     */
+    
+    // Placeholder scroll event listener for potential future enhancements.
+    document.addEventListener("scroll", () => {});
+
+    // Register GSAP plugins for use throughout the application.
+    gsap.registerPlugin(Flip, ScrollTrigger, ScrollToPlugin);
+
+    // Initialize Lenis for smooth, momentum-based scrolling.
+    const lenis = new Lenis();
+
+    /**
+     * Animation Frame Helper
+     * Continuously updates Lenis scroll calculations on every animation frame
+     * for smooth, performant scrolling throughout the site.
+     */
+    const __animFrameRequestHelper = (time) => {
+        lenis.raf(time);
+        requestAnimationFrame(__animFrameRequestHelper);
+    };
+
+    // Start the smooth scroll animation loop.
+    requestAnimationFrame(__animFrameRequestHelper);
+
+    // Console branding message for developers inspecting the site.
+    console.log(
+        "%cD J    P R O F E S S O R    K A S H",
+        "background-color: black;color: white; font-size: 16px; font-weight: bold; padding:5px 25px; margin-top:20px",
+    );
+
+    // Page transition effects
+    const transitionOverlay = document.getElementById("page-transition-overlay");
+    
+    // Check if we're coming from a navigation
+    const isNavigating = sessionStorage.getItem('navigating') === 'true';
+    sessionStorage.removeItem('navigating');
+    
+    if (transitionOverlay) {
+        if (isNavigating) {
+            // Add loading class for animation when fading FROM white
+            transitionOverlay.classList.add('loading');
+            
+            // Fade from white after content loads
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    transitionOverlay.style.opacity = "0";
+                    // Remove loading class after fade completes
+                    setTimeout(() => {
+                        transitionOverlay.classList.remove('loading');
+                    }, 500);
+                }, 100);
+            });
+        } else {
+            // Direct page load (no transition needed)
+            transitionOverlay.style.opacity = "0";
+        }
+    }
+
+    // Handle route transitions
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('a');
+        if (target && target.href && !target.href.startsWith('#') && !target.target && target.hostname === window.location.hostname) {
+            e.preventDefault();
+            const href = target.href;
+            
+            // Mark that we're navigating
+            sessionStorage.setItem('navigating', 'true');
+            
+            // Add compressing class for dot animation
+            if (transitionOverlay) {
+                transitionOverlay.classList.add('compressing');
+                transitionOverlay.style.opacity = "1";
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 500);
+            } else {
+                window.location.href = href;
+            }
+        }
+    });
+
+    // "Back to Top" button visibility management.
+    const backToTopButton = document.getElementById("backToTop");
+    backToTopButton.style.display = "none"; // Hidden by default on page load.
+
+    /**
+     * Show/hide the "back to top" button based on scroll position.
+     * Button appears after scrolling down 50% of the viewport height.
+     */
+    window.addEventListener("scroll", () => {
+        const scrollThreshold = window.innerHeight * 0.5; // 50% of viewport height.
+        
+        if (window.scrollY > scrollThreshold) {
+            backToTopButton.style.display = "block"; // Show button when threshold exceeded.
+        } else {
+            backToTopButton.style.display = "none"; // Hide button when near top of page.
+        }
+    });
+</script>

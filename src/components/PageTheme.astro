@@ -1,0 +1,119 @@
+<!-- 
+  Theme Toggle Component (Currently Hidden)
+  
+  This component manages the global theme state and initializes the animation mode randomly.
+  The toggle switch UI is hidden (display: none) as the animation mode is now controlled by
+  clicking the "KASH" text on the homepage. However, the initialization logic is still used
+  to set the randomized starting state for the animations.
+-->
+<div id="togglePhysicsBtn" class="theme justify-start absolute z-10 right-14 lg:right-4 top-9 w-[54px] h-6 p-[3px] bg-white rounded-[14px] border border-black items-center gap-2.5 inline-flex" style="display: none;">
+        <div class="circle w-[18px] h-[18px] bg-silver rounded-full shadow"></div>
+</div>
+
+<script is:inline>
+    // DOM element references for theme toggle functionality.
+    const toggleTheme = document.querySelector(".theme");
+    const targetTheme = document.documentElement;
+    const circle = document.querySelector(".circle");
+    let inbetweeningState = false; // Prevents animation conflicts during GSAP transitions.
+
+    // Randomly initialize the animation mode (equal chance between fractal, orbiting, sand field, and TRON).
+    const randomValue = Math.random();
+    let initialState;
+    if (randomValue < 0.25) {
+        initialState = "fractals";
+    } else if (randomValue < 0.5) {
+        initialState = "planets";
+    } else if (randomValue < 0.75) {
+        initialState = "sandfield";
+    } else {
+        initialState = "tron";
+    }
+    targetTheme.classList.add(initialState);
+    localStorage.setItem("theme", initialState);
+    
+    // Position the toggle slider based on the randomized initial state.
+    if (initialState === "planets") {
+        toggleTheme.classList.remove("justify-start");
+        toggleTheme.classList.add("justify-end");
+    } else if (initialState === "sandfield") {
+        toggleTheme.classList.remove("justify-start");
+        toggleTheme.classList.add("justify-center");
+    } else if (initialState === "tron") {
+        toggleTheme.classList.remove("justify-start");
+        toggleTheme.classList.add("justify-end");
+    }
+
+    /**
+     * Switches the theme between fractal and orbiting modes.
+     * Uses GSAP Flip animations for smooth visual transitions of the toggle slider.
+     * This function is currently unused as the toggle UI is hidden, but remains for
+     * potential future re-enablement of the toggle switch interface.
+     */
+    const switchTheme = () => {
+        // Prevent multiple simultaneous theme switches during GSAP animation.
+        if (inbetweeningState) return;
+        inbetweeningState = true;
+
+        // Capture initial state for GSAP Flip animation.
+        const state = Flip.getState(circle);
+
+        if (targetTheme.classList.contains("planets")) {
+            // Switch from orbiting mode back to fractal mode.
+            targetTheme.classList.remove("planets");
+            targetTheme.classList.add("fractals");
+            localStorage.setItem("theme", "fractals");
+            
+            // Animate toggle slider from right to left position.
+            toggleTheme.classList.remove("justify-end");
+            toggleTheme.classList.add("justify-start");
+        } else if (targetTheme.classList.contains("fractals")) {
+            // Switch from fractal mode to orbiting mode.
+            targetTheme.classList.remove("fractals");
+            targetTheme.classList.add("planets");
+            localStorage.setItem("theme", "planets");
+            
+            // Animate toggle slider from left to right position.
+            toggleTheme.classList.remove("justify-start");
+            toggleTheme.classList.add("justify-end");
+        }
+
+        // TODO: Future Enhancement - Enable UI/UX for Ternary Switch.
+        // This would add a third animation mode (e.g., "cells") with a three-position toggle.
+        // if (targetTheme.classList.contains("cells")) {
+        //     // If clicked state is `3: Cells`, switch back to `1: Fractals`
+        //     targetTheme.classList.remove("cells");
+        //     targetTheme.classList.add("fractals");
+        //     localStorage.setItem("theme", "fractals");
+        //     // Move slider from third position back to first position
+        //     toggleTheme.classList.remove("justify-end");
+        //     toggleTheme.classList.add("justify-start");
+        // } else if (targetTheme.classList.contains("planets")) {
+        //     // If clicked state is `2: Planets`, switch to `3: Cells`
+        //     targetTheme.classList.remove("planets");
+        //     targetTheme.classList.add("cells");
+        //     localStorage.setItem("theme", "cells");
+        //     // Move slider from second position to third position
+        //     toggleTheme.classList.remove("justify-center");
+        //     toggleTheme.classList.add("justify-end");
+        // } else if (targetTheme.classList.contains("fractals")) {
+        //     // If clicked state is `1: Fractals`, switch to `2: Planets`
+        //     targetTheme.classList.remove("fractals");
+        //     targetTheme.classList.add("planets");
+        //     localStorage.setItem("theme", "planets");
+        //     // Move slider from first position to second position
+        //     toggleTheme.classList.remove("justify-start");
+        //     toggleTheme.classList.add("justify-center");
+        // }
+
+        // Execute GSAP Flip animation with bounce easing for playful effect.
+        Flip.from(state, {
+            duration: 0.5,
+            ease: "bounce.out",
+            onComplete: () => (inbetweeningState = false) // Re-enable clicks after animation completes.
+        });
+    }
+
+    // Attach click handler (currently inactive due to hidden UI).
+    toggleTheme.addEventListener("click", switchTheme);
+</script>

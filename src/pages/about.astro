@@ -1,0 +1,199 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import DynamicGeometry from "../components/DynamicGeometry.astro";
+---
+
+<BaseLayout
+    title="Aakash Sudhakar"
+    description="Understanding the world and human expression through code and communication."
+    type="website"
+>
+    <div id="contact" class="m-5">
+        <!-- Subtle snowfall effect -->
+        <canvas id="snowfall" class="fixed top-0 left-0 w-full h-full z-0 pointer-events-none"></canvas>
+        
+        <DynamicGeometry />
+        <div class="relative z-10 mt-7 md:mt-12">
+            <!-- Mobile: Headers -->
+            <div class="md:hidden max-w-md">
+                <h1 class="font-bold text-2xl font-poppins">
+                    My name is Aakash Sudhakar.
+                </h1>
+                <br />
+                <h2 class="font-medium text-lg font-poppins">
+                    But you can call me <i
+                        ><big class="text-gold">Kash</big></i
+                    >.
+                </h2>
+            </div>
+
+            <!-- Mobile: GIF -->
+            <div class="md:hidden flex justify-left items-left my-6">
+                <img
+                    src="https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/lofi_kash.gif"
+                    alt="Animated illustration"
+                    class="rounded-3xl shadow-lg mobile-gif-style"
+                    style="border: 4px solid #bae6fd;"
+                    loading="lazy"
+                />
+            </div>
+
+            <!-- Mobile: Paragraph -->
+            <div class="md:hidden max-w-md">
+                <p
+                    class="text-sm font-poppins font-light text-balance tracking-tighter pb-4"
+                >
+                    As a DEVELOPER, I bring together technology,
+                    mathematics, gamification, and the natural sciences to
+                    explore and better understand the world around us.
+                    <br /><br />
+                    As an EDUCATOR, I build socially conscious and project-driven courses 
+                    to empower communities of students to build beautiful things 
+                    and invent a better future.
+                    <br /><br />
+                    As a POLICY ADVOCATE, I engage with regulatory and governance frameworks to
+                    influence the intersection of technology and society while promoting
+                    healthier engagement with and development of digital technologies.
+                    <br /><br />
+                    And as a HUMAN, I balance curiosity with passion, embracing pursuits in 
+                    writing, cooking, athletics, advocacy, community service, and lifelong learning.
+                </p>
+            </div>
+
+            <!-- Desktop: Side-by-side layout -->
+            <div class="hidden md:flex md:flex-row md:justify-start gap-6 md:gap-12 md:items-center text-balance">
+                <div class="md:w-3/5 text-pretty" id="texts">
+                    <div id="left" class="max-w-lg">
+                        <h1 class="font-bold text-3xl font-poppins">
+                            My name is Aakash Sudhakar.
+                        </h1>
+                        <br />
+
+                        <h2 class="font-medium text-lg font-poppins">
+                            But you can call me <i
+                                ><big class="text-gold">Kash</big></i
+                            >.
+                        </h2>
+
+                        <p
+                            class="mt-5 pb-4 md:pb-0 text-sm font-poppins font-light text-balance tracking-tighter"
+                        >
+                    As a <b>DEVELOPER</b>, I bring together technology,
+                    mathematics, gamification, and the natural sciences to
+                    explore and better understand the world around us.
+                    <br /><br />
+                    As an <b>EDUCATOR</b>, I build socially conscious and project-driven courses 
+                    to empower communities of students to build beautiful things 
+                    and invent a better future.
+                    <br /><br />
+                    As a <b>POLICY ADVOCATE</b>, I engage with regulatory and governance frameworks to
+                    influence the intersection of technology and society while promoting
+                    healthier engagement with and development of digital technologies.
+                    <br /><br />
+                    And as a <b>HUMAN</b>, I balance curiosity with passion, embracing pursuits in 
+                    writing, cooking, athletics, advocacy, community service, and lifelong learning.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Right side animated image section (desktop only) -->
+                <div class="md:w-2/5 flex justify-center items-center">
+                    <img
+                        src="https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/lofi_kash.gif"
+                        alt="Animated illustration"
+                        class="rounded-full shadow-lg"
+                        style="width: 350px; height: 400px; object-fit: cover; object-position: 30% 50%; border: 4px solid #bae6fd;"
+                        loading="lazy"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+</BaseLayout>
+
+<style>
+    /* Mobile: rectangular aspect ratio */
+    @media (max-width: 767px) {
+        .mobile-gif-style {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            object-position: 30% 50%;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const canvas = document.getElementById("snowfall");
+        const ctx = canvas.getContext("2d");
+        
+        // Set canvas size
+        const resizeCanvas = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+        
+        // Snowflake particle class
+        class Snowflake {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * canvas.height; // Random initial position
+            }
+            
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = -10;
+                this.size = Math.random() * 1.5 + 0.5; // 0.5px to 2px
+                this.speed = Math.random() * 1.215 + 0.81; // Additional 10% slower (0.81-2.025)
+                this.drift = Math.random() * 0.3 - 0.15; // Slight horizontal drift
+                this.opacity = Math.random() * 0.4 + 0.2; // 0.2 to 0.6 opacity
+            }
+            
+            update() {
+                this.y += this.speed;
+                this.x += this.drift;
+                
+                // Reset if off screen
+                if (this.y > canvas.height) {
+                    this.reset();
+                }
+                if (this.x < 0 || this.x > canvas.width) {
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+        
+        // Create snowflakes (~403 particles, 20% more)
+        const snowflakes = [];
+        for (let i = 0; i < 403; i++) {
+            snowflakes.push(new Snowflake());
+        }
+        
+        // Animation loop
+        const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            snowflakes.forEach(snowflake => {
+                snowflake.update();
+                snowflake.draw();
+            });
+            
+            requestAnimationFrame(animate);
+        };
+        
+        animate();
+    });
+</script>
