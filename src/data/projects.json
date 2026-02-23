@@ -1,11 +1,12 @@
 {
   "skillsFiltering": [
     { "display": "AGRICULTURE", "value": "Agriculture" },
+    { "display": "SPORTS", "value": "Athletics" },
     { "display": "ML", "value": "Machine Learning" },
     { "display": "GAMES", "value": "Game Development" },
-    { "display": "MOBILE APPS", "value": "Mobile Development" },
+    { "display": "MOBILE", "value": "Mobile Development" },
     { "display": "DATA VIZ", "value": "Data Visualization" },
-    { "display": "BIOTECH", "value": "Biotechnology" }
+    { "display": "SCIENCE", "value": "Applied Sciences" }
   ],
   "projects": [
     {
@@ -76,7 +77,7 @@
       "imageURLOnDisplay": "https://placedog.net/600/403",
       "imageURLOnHover": "https://placedog.net/600/803",
       "imageURLOnExpand": "https://placedog.net/600/1203",
-      "skills": ["Data Visualization", "Machine Learning", "Biotechnology"],
+      "skills": ["Data Visualization", "Machine Learning", "Applied Sciences"],
       "isActive": true
     },
     {
@@ -108,178 +109,80 @@
       "imageURLOnDisplay": "https://placedog.net/600/405",
       "imageURLOnHover": "https://placedog.net/600/805",
       "imageURLOnExpand": "https://placedog.net/600/1205",
-      "skills": ["Mobile Development", "Machine Learning", "Biotechnology"],
+      "skills": ["Mobile Development", "Machine Learning", "Applied Sciences"],
       "isActive": true
     },
     {
       "id": 7,
-      "name": "IoT Home Automation Hub",
-      "tagline": "Smart home control system with ML-powered automation",
-      "description": "A comprehensive home automation system that integrates various IoT devices into a unified control hub. Features machine learning algorithms that learn user patterns to automate routines, energy optimization, and predictive maintenance alerts.",
+      "name": "Nucleus",
+      "tagline": "TBD.",
+      "description": "TBD.",
       "technologies": [
-        "Raspberry Pi",
-        "MQTT",
-        "Python",
-        "React Native",
-        "TensorFlow Lite",
-        "InfluxDB"
+        "?"
       ],
       "imageURLOnDisplay": "https://placedog.net/600/406",
       "imageURLOnHover": "https://placedog.net/600/806",
       "imageURLOnExpand": "https://placedog.net/600/1206",
-      "skills": ["IoT", "Automation"],
-      "isActive": false
+      "skills": ["Data Visualization", "Applied Sciences"],
+      "isActive": true
     },
     {
       "id": 8,
-      "name": "Medical Image Diagnosis Assistant",
-      "tagline": "Deep learning system for medical image analysis",
-      "description": "An AI-powered diagnostic tool that assists radiologists in identifying anomalies in medical imaging. Uses convolutional neural networks trained on large datasets to detect patterns in X-rays, MRIs, and CT scans with high accuracy and explainable AI visualizations.",
+      "name": "RxControl",
+      "tagline": "TBD.",
+      "description": "TBD.",
       "technologies": [
-        "PyTorch",
-        "OpenCV",
-        "Flask",
-        "PostgreSQL",
-        "Docker",
-        "DICOM"
+        "?"
       ],
       "imageURLOnDisplay": "https://placedog.net/600/407",
       "imageURLOnHover": "https://placedog.net/600/807",
       "imageURLOnExpand": "https://placedog.net/600/1207",
-      "skills": ["Healthcare", "Machine Learning"],
-      "isActive": false
+      "skills": ["Machine Learning", "Data Visualization", "Applied Sciences"],
+      "isActive": true
     },
     {
       "id": 9,
-      "name": "Social Network Analytics Engine",
-      "tagline": "Real-time social media sentiment and trend analysis",
-      "description": "A powerful analytics engine that processes millions of social media posts in real-time to extract sentiment, identify trending topics, and detect emerging patterns. Includes natural language processing, entity recognition, and customizable alert systems for brands and researchers.",
+      "name": "Helical",
+      "tagline": "TBD.",
+      "description": "",
       "technologies": [
-        "Apache Kafka",
-        "Spark",
-        "Elasticsearch",
-        "NLP",
-        "Vue.js",
-        "Redis"
+        "Python",
+        "JavaScript"
       ],
       "imageURLOnDisplay": "https://placedog.net/600/408",
       "imageURLOnHover": "https://placedog.net/600/808",
       "imageURLOnExpand": "https://placedog.net/600/1208",
-      "skills": ["Analytics", "Social Media"],
-      "isActive": false
+      "skills": ["Applied Sciences", "Mathematics"],
+      "isActive": true
     },
     {
       "id": 10,
-      "name": "Augmented Reality Museum Guide",
-      "tagline": "Interactive AR experiences for museum exhibits",
-      "description": "An augmented reality application that enhances museum visits by overlaying digital content on physical exhibits. Features include 3D model reconstructions, historical context, interactive storytelling, and multi-language support. Uses computer vision for exhibit recognition and tracking.",
+      "name": "The Fight Collective",
+      "tagline": "?",
+      "description": "?",
       "technologies": [
-        "ARKit",
-        "Unity",
-        "C#",
-        "Firebase",
-        "Vuforia",
-        "Swift"
+        "JavaScript",
+        "Tailwind"
       ],
-      "imageURLOnDisplay": "https://placedog.net/600/409",
-      "imageURLOnHover": "https://placedog.net/600/809",
-      "imageURLOnExpand": "https://placedog.net/600/1209",
-      "skills": ["AR/VR", "Museums", "Education"],
+      "imageURLOnDisplay": "https://placedog.net/600/408",
+      "imageURLOnHover": "https://placedog.net/600/808",
+      "imageURLOnExpand": "https://placedog.net/600/1208",
+      "skills": ["Applied Sciences", "Mathematics"],
       "isActive": false
     },
     {
       "id": 11,
-      "name": "Cryptocurrency Trading Bot",
-      "tagline": "Algorithmic trading system with ML predictions",
-      "description": "An automated cryptocurrency trading system that uses machine learning models to predict market movements and execute trades. Features risk management, backtesting framework, real-time market data integration, and comprehensive performance analytics.",
+      "name": "Arcane Soul Productions",
+      "tagline": "?",
+      "description": "?",
       "technologies": [
-        "Python",
-        "Pandas",
-        "Scikit-learn",
-        "Binance API",
-        "PostgreSQL",
-        "Docker"
+        "JavaScript",
+        "Tailwind"
       ],
-      "imageURLOnDisplay": "https://placedog.net/600/410",
-      "imageURLOnHover": "https://placedog.net/600/810",
-      "imageURLOnExpand": "https://placedog.net/600/1210",
-      "skills": ["Finance", "Trading"],
-      "isActive": false
-    },
-    {
-      "id": 12,
-      "name": "Voice Assistant for Accessibility",
-      "tagline": "AI-powered voice control for assistive technology",
-      "description": "A voice-controlled assistant designed specifically for users with mobility impairments. Integrates with smart home devices, computers, and mobile phones to provide hands-free control. Features natural language understanding, custom command creation, and multi-modal feedback.",
-      "technologies": [
-        "Python",
-        "TensorFlow",
-        "Speech Recognition",
-        "NLP",
-        "MQTT",
-        "React"
-      ],
-      "imageURLOnDisplay": "https://placedog.net/600/411",
-      "imageURLOnHover": "https://placedog.net/600/811",
-      "imageURLOnExpand": "https://placedog.net/600/1211",
-      "skills": ["Accessibility", "Voice Tech"],
-      "isActive": false
-    },
-    {
-      "id": 13,
-      "name": "Real-Time Collaborative Code Editor",
-      "tagline": "Multi-user code editing with live collaboration",
-      "description": "A web-based code editor that enables real-time collaboration between multiple developers. Features include syntax highlighting for 50+ languages, integrated video chat, code execution, version history, and conflict resolution. Built with operational transformation algorithms for seamless synchronization.",
-      "technologies": [
-        "WebSocket",
-        "React",
-        "Node.js",
-        "Monaco Editor",
-        "Redis",
-        "WebRTC"
-      ],
-      "imageURLOnDisplay": "https://placedog.net/600/412",
-      "imageURLOnHover": "https://placedog.net/600/812",
-      "imageURLOnExpand": "https://placedog.net/600/1212",
-      "skills": ["Collaboration", "Development"],
-      "isActive": false
-    },
-    {
-      "id": 14,
-      "name": "Fitness Tracking & Analysis Platform",
-      "tagline": "Comprehensive health and fitness data aggregator",
-      "description": "A platform that aggregates data from multiple fitness devices and apps to provide comprehensive health insights. Features AI-powered workout recommendations, nutrition tracking, progress visualization, goal setting, and social challenges with friends.",
-      "technologies": [
-        "React Native",
-        "Node.js",
-        "MongoDB",
-        "TensorFlow",
-        "HealthKit",
-        "GraphQL"
-      ],
-      "imageURLOnDisplay": "https://placedog.net/600/413",
-      "imageURLOnHover": "https://placedog.net/600/813",
-      "imageURLOnExpand": "https://placedog.net/600/1213",
-      "skills": ["Health", "Fitness"],
-      "isActive": false
-    },
-    {
-      "id": 15,
-      "name": "Automated Document Processing System",
-      "tagline": "AI-powered document extraction and classification",
-      "description": "An enterprise document processing system that uses computer vision and NLP to automatically classify, extract, and validate information from various document types. Supports invoices, contracts, forms, and custom templates with high accuracy OCR and intelligent field mapping.",
-      "technologies": [
-        "PyTorch",
-        "Tesseract",
-        "FastAPI",
-        "PostgreSQL",
-        "Celery",
-        "Vue.js"
-      ],
-      "imageURLOnDisplay": "https://placedog.net/600/414",
-      "imageURLOnHover": "https://placedog.net/600/814",
-      "imageURLOnExpand": "https://placedog.net/600/1214",
-      "skills": ["Document Processing", "Automation"],
+      "imageURLOnDisplay": "https://placedog.net/600/408",
+      "imageURLOnHover": "https://placedog.net/600/808",
+      "imageURLOnExpand": "https://placedog.net/600/1208",
+      "skills": ["Applied Sciences", "Mathematics"],
       "isActive": false
     }
   ]

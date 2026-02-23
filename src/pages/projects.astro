@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import DynamicGeometry from "../components/DynamicGeometry.astro";
+import DynamicBGAnim from "../components/DynamicBGAnim.astro";
 import projectsData from "../data/projects.json";
 
 const projects = projectsData.projects;
@@ -9,7 +9,7 @@ const skillsFiltering = projectsData.skillsFiltering;
 
 <BaseLayout title="Projects - Aakash Sudhakar" description="Explore my portfolio of technology projects spanning AI, education, data science, and more." type="website">
     <div class="relative min-h-screen">
-        <DynamicGeometry />
+        <DynamicBGAnim />
         
         <!-- Projects Container -->
         <div class="relative z-20 py-20 px-6 md:px-12 lg:px-20">

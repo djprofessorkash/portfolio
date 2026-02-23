@@ -1,136 +1,173 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import DynamicGeometry from "../components/DynamicGeometry.astro";
+import DynamicBGAnim from "../components/DynamicBGAnim.astro";
 ---
 
 <BaseLayout
-    title="Aakash Sudhakar"
+    title="About Me - Aakash Sudhakar"
     description="Understanding the world and human expression through code and communication."
     type="website"
 >
-    <div id="contact" class="m-5">
+    <div class="relative">
         <!-- Subtle snowfall effect -->
         <canvas id="snowfall" class="fixed top-0 left-0 w-full h-full z-0 pointer-events-none"></canvas>
         
-        <DynamicGeometry />
-        <div class="relative z-10 mt-7 md:mt-12">
-            <!-- Mobile: Headers -->
-            <div class="md:hidden max-w-md">
-                <h1 class="font-bold text-2xl font-poppins">
-                    My name is Aakash Sudhakar.
+        <DynamicBGAnim />
+        
+        <!-- Section 1: Hero with centered GIF and typing text -->
+        <section id="section-hero" class="relative z-10 min-h-screen flex flex-col items-center justify-center px-6">
+            <div class="flex flex-col items-center gap-6 max-w-2xl">
+                <!-- Top typing text -->
+                <h1 id="hero-text-1" class="font-bold text-2xl md:text-3xl font-poppins text-center text-pearl min-h-[2.5rem]">
                 </h1>
-                <br />
-                <h2 class="font-medium text-lg font-poppins">
-                    But you can call me <i
-                        ><big class="text-gold">Kash</big></i
-                    >.
+                
+                <!-- Centered GIF with soft borders -->
+                <div class="relative">
+                    <img
+                        src="https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/lofi_kash.gif"
+                        alt="Animated illustration of Kash"
+                        class="rounded-3xl shadow-2xl"
+                        style="width: 100%; max-width: 500px; height: auto; border: 4px solid rgba(186, 230, 253, 0.4);"
+                        loading="eager"
+                    />
+                </div>
+                
+                <!-- Bottom typing text -->
+                <h2 id="hero-text-2" class="font-medium text-lg md:text-xl font-poppins text-center text-pearl min-h-[2rem]">
                 </h2>
             </div>
+            
+            <!-- Scroll down indicator -->
+            <button id="scroll-down-hero" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer opacity-0 transition-opacity duration-500 hover:scale-110">
+                <svg class="w-8 h-8 text-pearl animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </button>
+        </section>
 
-            <!-- Mobile: GIF -->
-            <div class="md:hidden flex justify-left items-left my-6">
-                <img
-                    src="https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/lofi_kash.gif"
-                    alt="Animated illustration"
-                    class="rounded-3xl shadow-lg mobile-gif-style"
-                    style="border: 4px solid #bae6fd;"
-                    loading="lazy"
-                />
-            </div>
-
-            <!-- Mobile: Paragraph -->
-            <div class="md:hidden max-w-md">
-                <p
-                    class="text-sm font-poppins font-light text-balance tracking-tighter pb-4"
-                >
-                    As a DEVELOPER, I bring together technology,
-                    mathematics, gamification, and the natural sciences to
-                    explore and better understand the world around us.
-                    <br /><br />
-                    As an EDUCATOR, I build socially conscious and project-driven courses 
-                    to empower communities of students to build beautiful things 
-                    and invent a better future.
-                    <br /><br />
-                    As a POLICY ADVOCATE, I engage with regulatory and governance frameworks to
-                    influence the intersection of technology and society while promoting
-                    healthier engagement with and development of digital technologies.
-                    <br /><br />
-                    And as a HUMAN, I balance curiosity with passion, embracing pursuits in 
-                    writing, cooking, athletics, advocacy, community service, and lifelong learning.
-                </p>
-            </div>
-
-            <!-- Desktop: Side-by-side layout -->
-            <div class="hidden md:flex md:flex-row md:justify-start gap-6 md:gap-12 md:items-center text-balance">
-                <div class="md:w-3/5 text-pretty" id="texts">
-                    <div id="left" class="max-w-lg">
-                        <h1 class="font-bold text-3xl font-poppins">
-                            My name is Aakash Sudhakar.
-                        </h1>
-                        <br />
-
-                        <h2 class="font-medium text-lg font-poppins">
-                            But you can call me <i
-                                ><big class="text-gold">Kash</big></i
-                            >.
-                        </h2>
-
-                        <p
-                            class="mt-5 pb-4 md:pb-0 text-sm font-poppins font-light text-balance tracking-tighter"
-                        >
-                    As a <b>DEVELOPER</b>, I bring together technology,
-                    mathematics, gamification, and the natural sciences to
-                    explore and better understand the world around us.
-                    <br /><br />
-                    As an <b>EDUCATOR</b>, I build socially conscious and project-driven courses 
-                    to empower communities of students to build beautiful things 
-                    and invent a better future.
-                    <br /><br />
-                    As a <b>POLICY ADVOCATE</b>, I engage with regulatory and governance frameworks to
-                    influence the intersection of technology and society while promoting
-                    healthier engagement with and development of digital technologies.
-                    <br /><br />
-                    And as a <b>HUMAN</b>, I balance curiosity with passion, embracing pursuits in 
-                    writing, cooking, athletics, advocacy, community service, and lifelong learning.
-                        </p>
+        <!-- Section 2: Developer (text left-to-right from center, image placeholder left) -->
+        <section id="section-developer" class="relative z-10 min-h-screen flex items-center px-6 md:px-12 lg:px-20">
+            <div class="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+                <!-- Image placeholder (left) -->
+                <div class="order-2 md:order-1 flex items-center justify-center">
+                    <div class="w-full aspect-square max-w-md bg-pearl/10 rounded-3xl border-4 border-pearl/20 flex items-center justify-center">
+                        <span class="text-pearl/40 font-poppins text-sm">Image Coming Soon</span>
                     </div>
                 </div>
                 
-                <!-- Right side animated image section (desktop only) -->
-                <div class="md:w-2/5 flex justify-center items-center">
-                    <img
-                        src="https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/lofi_kash.gif"
-                        alt="Animated illustration"
-                        class="rounded-full shadow-lg"
-                        style="width: 350px; height: 400px; object-fit: cover; object-position: 30% 50%; border: 4px solid #bae6fd;"
-                        loading="lazy"
-                    />
+                <!-- Text content (right) -->
+                <div class="order-1 md:order-2">
+                    <p id="developer-text" class="text-base md:text-lg font-poppins leading-relaxed text-pearl">
+                        <span id="developer-text-bold" class="font-bold text-2xl md:text-3xl"></span><span id="developer-text-light" class="font-medium text-lg md:text-xl"></span>
+                    </p>
                 </div>
             </div>
-        </div>
+            
+            <!-- Scroll down indicator -->
+            <button id="scroll-down-developer" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer opacity-0 transition-opacity duration-500 hover:scale-110">
+                <svg class="w-8 h-8 text-pearl animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </button>
+        </section>
+
+        <!-- Section 3: Educator (text right-to-left from center, image placeholder right) -->
+        <section id="section-educator" class="relative z-10 min-h-screen flex items-center px-6 md:px-12 lg:px-20">
+            <div class="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+                <!-- Text content (left) -->
+                <div class="order-1">
+                    <p id="educator-text" class="text-base md:text-lg font-poppins leading-relaxed text-pearl md:text-right">
+                        <span id="educator-text-bold" class="font-bold text-2xl md:text-3xl"></span><span id="educator-text-light" class="font-medium text-lg md:text-xl"></span>
+                    </p>
+                </div>
+                
+                <!-- Image placeholder (right) -->
+                <div class="order-2 flex items-center justify-center">
+                    <div class="w-full aspect-square max-w-md bg-pearl/10 rounded-3xl border-4 border-pearl/20 flex items-center justify-center">
+                        <span class="text-pearl/40 font-poppins text-sm">Image Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Scroll down indicator -->
+            <button id="scroll-down-educator" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer opacity-0 transition-opacity duration-500 hover:scale-110">
+                <svg class="w-8 h-8 text-pearl animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </button>
+        </section>
+
+        <!-- Section 4: Policy Advocate (text left-to-right from center, image placeholder left) -->
+        <section id="section-advocate" class="relative z-10 min-h-screen flex items-center px-6 md:px-12 lg:px-20">
+            <div class="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+                <!-- Image placeholder (left) -->
+                <div class="order-2 md:order-1 flex items-center justify-center">
+                    <div class="w-full aspect-square max-w-md bg-pearl/10 rounded-3xl border-4 border-pearl/20 flex items-center justify-center">
+                        <span class="text-pearl/40 font-poppins text-sm">Image Coming Soon</span>
+                    </div>
+                </div>
+                
+                <!-- Text content (right) -->
+                <div class="order-1 md:order-2">
+                    <p id="advocate-text" class="text-base md:text-lg font-poppins leading-relaxed text-pearl">
+                        <span id="advocate-text-bold" class="font-bold text-2xl md:text-3xl"></span><span id="advocate-text-light" class="font-medium text-lg md:text-xl"></span>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Scroll down indicator -->
+            <button id="scroll-down-advocate" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer opacity-0 transition-opacity duration-500 hover:scale-110">
+                <svg class="w-8 h-8 text-pearl animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </button>
+        </section>
+
+        <!-- Section 5: Human (text right-to-left from center, image placeholder right) -->
+        <section id="section-human" class="relative z-10 min-h-screen flex items-center px-6 md:px-12 lg:px-20 pb-32">
+            <div class="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+                <!-- Text content (left) -->
+                <div class="order-1">
+                    <p id="human-text" class="text-base md:text-lg font-poppins leading-relaxed text-pearl md:text-right">
+                        <span id="human-text-bold" class="font-bold text-2xl md:text-3xl"></span><span id="human-text-light" class="font-medium text-lg md:text-xl"></span>
+                    </p>
+                </div>
+                
+                <!-- Image placeholder (right) -->
+                <div class="order-2 flex items-center justify-center">
+                    <div class="w-full aspect-square max-w-md bg-pearl/10 rounded-3xl border-4 border-pearl/20 flex items-center justify-center">
+                        <span class="text-pearl/40 font-poppins text-sm">Image Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 </BaseLayout>
 
 <style>
-    /* Mobile: rectangular aspect ratio */
-    @media (max-width: 767px) {
-        .mobile-gif-style {
-            width: 100%;
-            max-width: 400px;
-            height: auto;
-            aspect-ratio: 16/9;
-            object-fit: cover;
-            object-position: 30% 50%;
-        }
+    /* Smooth scrolling behavior */
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    /* Custom typing cursor effect */
+    .typing-cursor::after {
+        content: '|';
+        animation: blink 1s step-end infinite;
+    }
+    
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
     }
 </style>
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        const canvas = document.getElementById("snowfall");
-        const ctx = canvas.getContext("2d");
+        // Snowfall effect setup
+        const canvas = document.getElementById("snowfall") as HTMLCanvasElement;
+        const ctx = canvas.getContext("2d")!;
         
-        // Set canvas size
         const resizeCanvas = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -138,27 +175,32 @@ import DynamicGeometry from "../components/DynamicGeometry.astro";
         resizeCanvas();
         window.addEventListener("resize", resizeCanvas);
         
-        // Snowflake particle class
         class Snowflake {
+            x: number;
+            y: number;
+            size: number;
+            speed: number;
+            drift: number;
+            opacity: number;
+            
             constructor() {
                 this.reset();
-                this.y = Math.random() * canvas.height; // Random initial position
+                this.y = Math.random() * canvas.height;
             }
             
             reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = -10;
-                this.size = Math.random() * 1.5 + 0.5; // 0.5px to 2px
-                this.speed = Math.random() * 1.215 + 0.81; // Additional 10% slower (0.81-2.025)
-                this.drift = Math.random() * 0.3 - 0.15; // Slight horizontal drift
-                this.opacity = Math.random() * 0.4 + 0.2; // 0.2 to 0.6 opacity
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speed = Math.random() * 1.215 + 0.81;
+                this.drift = Math.random() * 0.3 - 0.15;
+                this.opacity = Math.random() * 0.4 + 0.2;
             }
             
             update() {
                 this.y += this.speed;
                 this.x += this.drift;
                 
-                // Reset if off screen
                 if (this.y > canvas.height) {
                     this.reset();
                 }
@@ -176,24 +218,278 @@ import DynamicGeometry from "../components/DynamicGeometry.astro";
             }
         }
         
-        // Create snowflakes (~403 particles, 20% more)
-        const snowflakes = [];
+        const snowflakes: Snowflake[] = [];
         for (let i = 0; i < 403; i++) {
             snowflakes.push(new Snowflake());
         }
         
-        // Animation loop
-        const animate = () => {
+        const animateSnowfall = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
             snowflakes.forEach(snowflake => {
                 snowflake.update();
                 snowflake.draw();
             });
-            
-            requestAnimationFrame(animate);
+            requestAnimationFrame(animateSnowfall);
         };
-        
-        animate();
+        animateSnowfall();
+
+        // Typing animation function
+        function typeText(element: HTMLElement, text: string, speed: number = 50): Promise<void> {
+            return new Promise((resolve) => {
+                let index = 0;
+                element.classList.add('typing-cursor');
+                
+                const type = () => {
+                    if (index < text.length) {
+                        element.textContent += text.charAt(index);
+                        index++;
+                        setTimeout(type, speed);
+                    } else {
+                        element.classList.remove('typing-cursor');
+                        resolve();
+                    }
+                };
+                
+                type();
+            });
+        }
+
+        // Scroll locking state
+        let isScrollLocked = false;
+        let isTyping = false;
+
+        // Lock/unlock scroll
+        function lockScroll() {
+            isScrollLocked = true;
+            document.body.style.overflow = 'hidden';
+        }
+
+        function unlockScroll() {
+            isScrollLocked = false;
+            document.body.style.overflow = '';
+        }
+
+        // Scroll to section smoothly
+        function scrollToSection(sectionId: string) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                // Temporarily unlock scroll for smooth scrolling to work
+                unlockScroll();
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Content text for each section (split into bold and light parts)
+        const content = {
+            hero1: "My name is Aakash Sudhakar.",
+            hero2: "But you can call me Kash.",
+            developer: {
+                bold: "As a DEVELOPER,",
+                light: " I bring together technology, mathematics, gamification, and the natural sciences to explore and better understand the world around us."
+            },
+            educator: {
+                bold: "As an EDUCATOR,",
+                light: " I build socially conscious and project-driven courses to empower communities of students to build beautiful things and invent a better future."
+            },
+            advocate: {
+                bold: "As a POLICY ADVOCATE,",
+                light: " I engage with regulatory and governance frameworks to influence the intersection of technology and society while promoting healthier engagement with and development of digital technologies."
+            },
+            human: {
+                bold: "And as a HUMAN,",
+                light: " I balance curiosity with passion, embracing pursuits in writing, cooking, athletics, advocacy, community service, and lifelong learning."
+            }
+        };
+
+        // Track if Human section animation has completed
+        let humanAnimationComplete = false;
+
+        // Scroll to top smoothly
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Show scroll-up button after animation completes
+        function showScrollUpButton() {
+            const scrollUpBtn = document.getElementById('scroll-to-top-btn');
+            if (scrollUpBtn) {
+                scrollUpBtn.style.opacity = '1';
+                scrollUpBtn.style.pointerEvents = 'auto';
+            }
+        }
+
+        // Intersection Observer for scroll-triggered animations
+        const observerOptions = {
+            threshold: 0.3,
+            rootMargin: '0px'
+        };
+
+        let sectionsAnimated = {
+            hero: false,
+            developer: false,
+            educator: false,
+            advocate: false,
+            human: false
+        };
+
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const sectionId = entry.target.id;
+                    
+                    // Hero section
+                    if (sectionId === 'section-hero' && !sectionsAnimated.hero) {
+                        sectionsAnimated.hero = true;
+                        lockScroll();
+                        isTyping = true;
+                        
+                        const heroText1 = document.getElementById('hero-text-1')!;
+                        const heroText2 = document.getElementById('hero-text-2')!;
+                        const scrollBtn = document.getElementById('scroll-down-hero')!;
+                        
+                        typeText(heroText1, content.hero1, 40).then(() => {
+                            return typeText(heroText2, content.hero2, 40);
+                        }).then(() => {
+                            scrollBtn.style.opacity = '1';
+                            isTyping = false;
+                            unlockScroll();
+                        });
+                    }
+                    
+                    // Developer section
+                    if (sectionId === 'section-developer' && !sectionsAnimated.developer) {
+                        sectionsAnimated.developer = true;
+                        lockScroll();
+                        isTyping = true;
+                        
+                        const boldText = document.getElementById('developer-text-bold')!;
+                        const lightText = document.getElementById('developer-text-light')!;
+                        const scrollBtn = document.getElementById('scroll-down-developer')!;
+                        
+                        typeText(boldText, content.developer.bold, 40).then(() => {
+                            return typeText(lightText, content.developer.light, 25);
+                        }).then(() => {
+                            scrollBtn.style.opacity = '1';
+                            isTyping = false;
+                            unlockScroll();
+                        });
+                    }
+                    
+                    // Educator section
+                    if (sectionId === 'section-educator' && !sectionsAnimated.educator) {
+                        sectionsAnimated.educator = true;
+                        lockScroll();
+                        isTyping = true;
+                        
+                        const boldText = document.getElementById('educator-text-bold')!;
+                        const lightText = document.getElementById('educator-text-light')!;
+                        const scrollBtn = document.getElementById('scroll-down-educator')!;
+                        
+                        typeText(boldText, content.educator.bold, 40).then(() => {
+                            return typeText(lightText, content.educator.light, 25);
+                        }).then(() => {
+                            scrollBtn.style.opacity = '1';
+                            isTyping = false;
+                            unlockScroll();
+                        });
+                    }
+                    
+                    // Advocate section
+                    if (sectionId === 'section-advocate' && !sectionsAnimated.advocate) {
+                        sectionsAnimated.advocate = true;
+                        lockScroll();
+                        isTyping = true;
+                        
+                        const boldText = document.getElementById('advocate-text-bold')!;
+                        const lightText = document.getElementById('advocate-text-light')!;
+                        const scrollBtn = document.getElementById('scroll-down-advocate')!;
+                        
+                        typeText(boldText, content.advocate.bold, 40).then(() => {
+                            return typeText(lightText, content.advocate.light, 25);
+                        }).then(() => {
+                            scrollBtn.style.opacity = '1';
+                            isTyping = false;
+                            unlockScroll();
+                        });
+                    }
+                    
+                    // Human section
+                    if (sectionId === 'section-human' && !sectionsAnimated.human) {
+                        sectionsAnimated.human = true;
+                        lockScroll();
+                        isTyping = true;
+                        
+                        const boldText = document.getElementById('human-text-bold')!;
+                        const lightText = document.getElementById('human-text-light')!;
+                        
+                        typeText(boldText, content.human.bold, 40).then(() => {
+                            return typeText(lightText, content.human.light, 25);
+                        }).then(() => {
+                            // Mark animation as complete and show scroll-up button
+                            humanAnimationComplete = true;
+                            isTyping = false;
+                            unlockScroll();
+                            showScrollUpButton();
+                        });
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('section[id^="section-"]').forEach(section => {
+            sectionObserver.observe(section);
+        });
+
+        // Scroll button click handlers with smooth transitions
+        const scrollDownHero = document.getElementById('scroll-down-hero');
+        if (scrollDownHero) {
+            scrollDownHero.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!isTyping) {
+                    scrollToSection('section-developer');
+                }
+            });
+        }
+
+        const scrollDownDeveloper = document.getElementById('scroll-down-developer');
+        if (scrollDownDeveloper) {
+            scrollDownDeveloper.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!isTyping) {
+                    scrollToSection('section-educator');
+                }
+            });
+        }
+
+        const scrollDownEducator = document.getElementById('scroll-down-educator');
+        if (scrollDownEducator) {
+            scrollDownEducator.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!isTyping) {
+                    scrollToSection('section-advocate');
+                }
+            });
+        }
+
+        const scrollDownAdvocate = document.getElementById('scroll-down-advocate');
+        if (scrollDownAdvocate) {
+            scrollDownAdvocate.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!isTyping) {
+                    scrollToSection('section-human');
+                }
+            });
+        }
+
+        // Scroll-to-top button in footer
+        const scrollToTopBtn = document.getElementById('scroll-to-top-btn');
+        if (scrollToTopBtn) {
+            scrollToTopBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                scrollToTop();
+            });
+        }
     });
 </script>

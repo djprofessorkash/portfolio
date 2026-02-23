@@ -37,24 +37,11 @@ console.log(currentPath);
             <div
                 id="desktopLogoImage"
                 class="absolute inset-0 bg-no-repeat bg-left bg-cover opacity-0 transition-opacity duration-300"
-                style="background-color: #3C454D; background-image: url('https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/DJPKLogos_Pl&AuCombinedOnAg_Revised.png'); background-size: 200%;"
+                style="background-color: #3C454D; background-image: url('/media/home-logo.svg');"
             >
             </div>
         </div>
     </a>
-
-    <!-- 
-      Legacy Toggle Button (Deprecated)
-      Previously used for theme/animation switching, now replaced by the clickable "KASH" text.
-      Kept in codebase for potential future re-enablement.
-    -->
-    <!-- <div class="flex space-x-4 right-14 relative z-20">
-        <button id="togglePhysicsBtn" class="px-3 py-2 text-sm font-semibold bg-pearl text-pearl rounded-full hover:bg-red-400 hover:text-pearl transition">
-            <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M20 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6h-2m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4"/>
-            </svg>													
-        </button>
-    </div> -->
 
     <!-- 
       Burger Menu Toggle Button (Mobile Only)
@@ -76,27 +63,122 @@ console.log(currentPath);
         </button>
     </div>
 
+    {currentPath === "/" && (
+    <!-- 
+      Animation Title Display with Dropdown (Desktop)
+      Shows the current background animation mode with dropdown to select specific modes.
+      Top-right on desktop aligned with navigation.
+    -->
+    <div 
+        id="animationModeTitle"
+        class="hidden lg:block absolute top-[48px] right-4 transform -translate-y-1/2 font-code text-sm cursor-pointer"
+        style="z-index: 100;"
+    >
+        <div 
+            id="animationModeTitleButton"
+            class="px-4 py-2 rounded-lg border-2 transition-all duration-300 hover:animate-pulse flex items-center gap-2"
+            style="background-color: rgba(0, 0, 0, 0.35); border-color: var(--theme-hover-color); color: #e5e7eb; white-space: nowrap;"
+        >
+            <span id="animationModeTitleText">fractal frenetics</span>
+            <svg id="dropdownArrow" class="w-3 h-3 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </div>
+        
+        <!-- Dropdown menu -->
+        <div 
+            id="animationDropdown"
+            class="hidden absolute top-full right-0 mt-2 rounded-lg border-2 overflow-hidden"
+            style="background-color: rgba(0, 0, 0, 0.35); border-color: var(--theme-hover-color); min-width: 200px;"
+        >
+            <div 
+                class="animation-option px-4 py-2 transition-colors duration-200 cursor-pointer"
+                style="color: #bae6fd;"
+                data-mode="fractal"
+            >fractal frenetics</div>
+            <div 
+                class="animation-option px-4 py-2 transition-colors duration-200 cursor-pointer"
+                style="color: #D9BE4C;"
+                data-mode="planets"
+            >obstinate orbits</div>
+            <div 
+                class="animation-option px-4 py-2 transition-colors duration-200 cursor-pointer"
+                style="color: #C4A574;"
+                data-mode="sandfield"
+            >rippling rhythms</div>
+            <div 
+                class="animation-option px-4 py-2 transition-colors duration-200 cursor-pointer"
+                style="color: #FF6B9D;"
+                data-mode="tron"
+            >pageantic pursuers</div>
+            <div 
+                class="animation-option px-4 py-2 transition-colors duration-200 cursor-pointer"
+                style="color: #A78BFA;"
+                data-mode="portal"
+            >galvanic gates</div>
+        </div>
+    </div>
+    
+    <!-- Mobile version - centered at top -->
+    <div 
+        id="animationModeTitleMobile"
+        class="lg:hidden absolute top-2 left-1/2 transform -translate-x-1/2 font-code text-xs cursor-pointer"
+        style="z-index: 100;"
+    >
+        <div 
+            id="animationModeTitleButtonMobile"
+            class="px-3 py-1.5 rounded-lg border-2 transition-all duration-300 hover:animate-pulse flex items-center gap-2"
+            style="background-color: rgba(0, 0, 0, 0.35); border-color: var(--theme-hover-color); color: #e5e7eb; white-space: nowrap;"
+        >
+            <span id="animationModeTitleTextMobile">fractal frenetics</span>
+            <svg id="dropdownArrowMobile" class="w-2 h-2 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </div>
+        
+        <!-- Dropdown menu mobile -->
+        <div 
+            id="animationDropdownMobile"
+            class="hidden absolute top-full left-1/2 transform -translate-x-1/2 mt-2 rounded-lg border-2 overflow-hidden"
+            style="background-color: rgba(0, 0, 0, 0.35); border-color: var(--theme-hover-color); min-width: 180px;"
+        >
+            <div 
+                class="animation-option-mobile px-3 py-1.5 transition-colors duration-200 cursor-pointer"
+                style="color: #bae6fd;"
+                data-mode="fractal"
+            >fractal frenetics</div>
+            <div 
+                class="animation-option-mobile px-3 py-1.5 transition-colors duration-200 cursor-pointer"
+                style="color: #D9BE4C;"
+                data-mode="planets"
+            >obstinate orbits</div>
+            <div 
+                class="animation-option-mobile px-3 py-1.5 transition-colors duration-200 cursor-pointer"
+                style="color: #C4A574;"
+                data-mode="sandfield"
+            >rippling rhythms</div>
+            <div 
+                class="animation-option-mobile px-3 py-1.5 transition-colors duration-200 cursor-pointer"
+                style="color: #FF6B9D;"
+                data-mode="tron"
+            >pageantic pursuers</div>
+            <div 
+                class="animation-option-mobile px-3 py-1.5 transition-colors duration-200 cursor-pointer"
+                style="color: #A78BFA;"
+                data-mode="portal"
+            >galvanic gates</div>
+        </div>
+    </div>
+    )}
+
     <!-- 
       Main Navigation Links (Desktop Layout)
       Horizontal list of page routes with active state highlighting and hover effects.
       Hidden on mobile devices; accessible through burger menu instead.
     -->
     <ul
-        class="hidden absolute top-[64px] left-[100px] transform -translate-y-1/2 lg:flex lg:mx-auto lg:items-center lg:justify-start lg:w-auto lg:space-x-2 font-code"
+        class="hidden absolute top-[48px] left-[100px] transform -translate-y-1/2 lg:flex lg:mx-auto lg:items-center lg:justify-start lg:w-auto lg:space-x-2 font-code"
     >
-        <!-- 
-          Home Navigation Link (Currently Disabled)
-          Removed from active navigation since logo already serves as home link.
-        -->
-        <!-- <li>
-            <a class=`${(currentPath==="/") && "navIsActive"} hover:text-gold` id="homePage" href="/">home</a>
-        </li>
-        <li class="text-gray-300">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" class="w-4 h-4 current-fill" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v0m0 7v0m0 7v0m0-13a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
-            </svg>
-        </li> -->
-
         <!-- About Me page navigation link with active state detection -->
         <li>
             <a
@@ -107,20 +189,7 @@ console.log(currentPath);
         </li>
         <!-- Visual separator dot between navigation items -->
         <li class="text-gray-300">
-            <svg
-                class="w-4 h-4 current-fill"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 5v0m0 7v0m0 7v0m0-13a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                ></path>
-            </svg>
+            •
         </li>
 
         <!-- Initiatives side-expanding menu -->
@@ -148,32 +217,25 @@ console.log(currentPath);
                         <span class="font-bold text-silver dark:text-silver" style="white-space: nowrap;">p</span>
                     </a>
                     
-                    <!-- Research icon/button (disabled) -->
-                    <span
-                        class="initiative-icon flex items-center justify-center bg-gray-400 rounded-full transition-all duration-300 cursor-not-allowed opacity-50"
+                    <!-- Research icon/button -->
+                    <a
+                        class=`{${(currentPath==="/research/") && "navIsActive"} initiative-icon flex items-center justify-center bg-pearl rounded-full transition-all duration-300 cursor-pointer dynamic-hover`
+                        href="/research/"
                         data-label="research"
                         style="width: 40px; height: 40px; overflow: hidden;"
                     >
-                        <span class="font-bold text-silver dark:text-silver line-through" style="white-space: nowrap;">r</span>
-                    </span>
+                        <span class="font-bold text-silver dark:text-silver" style="white-space: nowrap;">r</span>
+                    </a>
                     
-                    <!-- Teaching icon/button (disabled) -->
-                    <span
-                        class="initiative-icon flex items-center justify-center bg-gray-400 rounded-full transition-all duration-300 cursor-not-allowed opacity-50"
+                    <!-- Teaching icon/button -->
+                    <a
+                        class=`{${(currentPath==="/teaching/") && "navIsActive"} initiative-icon flex items-center justify-center bg-pearl rounded-full transition-all duration-300 cursor-pointer dynamic-hover`
+                        href="/teaching/"
                         data-label="teaching"
                         style="width: 40px; height: 40px; overflow: hidden;"
                     >
-                        <span class="font-bold text-silver dark:text-silver line-through" style="white-space: nowrap;">t</span>
-                    </span>
-                    
-                    <!-- Advocacy icon/button (disabled) -->
-                    <span
-                        class="initiative-icon flex items-center justify-center bg-gray-400 rounded-full transition-all duration-300 cursor-not-allowed opacity-50"
-                        data-label="advocacy"
-                        style="width: 40px; height: 40px; overflow: hidden;"
-                    >
-                        <span class="font-bold text-silver dark:text-silver line-through" style="white-space: nowrap;">a</span>
-                    </span>
+                        <span class="font-bold text-silver dark:text-silver" style="white-space: nowrap;">t</span>
+                    </a>
                 </div>
             </div>
         </li>        <!-- 
@@ -252,7 +314,7 @@ console.log(currentPath);
                     <div
                         id="mobileLogoImage"
                         class="absolute inset-0 bg-no-repeat bg-left bg-cover rounded-full opacity-0 transition-opacity duration-300"
-                        style="background-color: #000000; background-image: url('https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/DJPKLogos_Pl&AuCombinedOnBl_Revised.png'); background-size: 200%;"
+                        style="background-color: #000000; background-image: url('/media/home-logo.svg'); background-size: 200%;"
                     >
                     </div>
                 </div>
@@ -319,17 +381,13 @@ console.log(currentPath);
                             class=`${(currentPath==="/projects/") && "navIsActiveMobile"} block p-4 font-semibold hover:bg-gray-50 dynamic-hover`
                             href="/projects/">projects</a
                         >
-                        <span
-                            class="block p-4 font-semibold text-gray-400 line-through cursor-not-allowed"
-                        >research</span
+                        <a
+                            class=`${(currentPath==="/research/") && "navIsActiveMobile"} block p-4 font-semibold hover:bg-gray-50 dynamic-hover`
+                            href="/research/">research</a
                         >
-                        <span
-                            class="block p-4 font-semibold text-gray-400 line-through cursor-not-allowed"
-                        >teaching</span
-                        >
-                        <span
-                            class="block p-4 font-semibold text-gray-400 line-through cursor-not-allowed"
-                        >advocacy</span
+                        <a
+                            class=`${(currentPath==="/teaching/") && "navIsActiveMobile"} block p-4 font-semibold hover:bg-gray-50 dynamic-hover`
+                            href="/teaching/">teaching</a
                         >
                     </div>
                 </li>
@@ -370,7 +428,7 @@ console.log(currentPath);
     
     // Preload desktop logo image
     const desktopLogoImg = new Image();
-    desktopLogoImg.src = 'https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/DJPKLogos_Pl&AuCombinedOnAg_Revised.png';
+    desktopLogoImg.src = '/media/home-logo.svg';
     desktopLogoImg.onload = () => {
         const logoElement = document.getElementById('desktopLogoImage');
         if (logoElement) {
@@ -380,7 +438,7 @@ console.log(currentPath);
 
     // Preload mobile logo image
     const mobileLogoImg = new Image();
-    mobileLogoImg.src = 'https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/DJPKLogos_Pl&AuCombinedOnBl_Revised.png';
+    mobileLogoImg.src = '/media/home-logo.svg';
     mobileLogoImg.onload = () => {
         const logoElement = document.getElementById('mobileLogoImage');
         if (logoElement) {
@@ -549,4 +607,275 @@ console.log(currentPath);
             });
         }
     }
+    /**
+     * Animation Mode Title Dropdown Handler
+     * 
+     * Manages dropdown menu for selecting specific animation modes.
+     * Includes backspace/retype animation effect on mode change.
+     * Dispatches hover events to slow down animation when dropdown is active.
+     */
+    
+    // Map theme names to display titles
+    const themeToTitle = {
+        'fractals': 'fractal frenetics',
+        'planets': 'obstinate orbits',
+        'sandfield': 'rippling rhythms',
+        'tron': 'pageantic pursuers',
+        'portal': 'galvanic gates'
+    };
+    
+    // Track dropdown state
+    let isDropdownOpen = false;
+    
+    // Track if animation is in progress
+    let isAnimating = false;
+    
+    // Function to animate backspace effect
+    function backspaceAnimation(element, callback) {
+        const currentText = element.textContent;
+        let index = currentText.length;
+        
+        const backspaceInterval = setInterval(() => {
+            if (index > 0) {
+                element.textContent = currentText.substring(0, index - 1);
+                index--;
+            } else {
+                clearInterval(backspaceInterval);
+                if (callback) callback();
+            }
+        }, 10); // 10ms per character for backspace
+    }
+    
+    // Function to animate typing effect
+    function typeAnimation(element, targetText, callback) {
+        let index = 0;
+        
+        const typeInterval = setInterval(() => {
+            if (index < targetText.length) {
+                element.textContent = targetText.substring(0, index + 1);
+                index++;
+            } else {
+                clearInterval(typeInterval);
+                if (callback) callback();
+            }
+        }, 15); // 15ms per character for typing
+    }
+    
+    // Function to update border color during transition
+    function updateBorderColor(containerElement, newColor) {
+        if (containerElement) {
+            containerElement.style.borderColor = newColor;
+        }
+    }
+    
+    // Get theme color map for border transitions
+    const themeToColor = {
+        'fractals': '#bae6fd',
+        'planets': '#D9BE4C',
+        'sandfield': '#C4A574',
+        'tron': '#FF6B9D',
+        'portal': '#A78BFA'
+    };
+    
+    // Function to update the animation mode title with backspace/retype animation
+    function updateAnimationTitle(animate = true) {
+        if (isAnimating && animate) return; // Prevent overlapping animations
+        
+        const currentTheme = localStorage.getItem('theme') || 'fractals';
+        const titleText = themeToTitle[currentTheme] || themeToTitle['fractals'];
+        const newBorderColor = themeToColor[currentTheme] || themeToColor['fractals'];
+        
+        const desktopTitleElement = document.getElementById('animationModeTitleText');
+        const mobileTitleElement = document.getElementById('animationModeTitleTextMobile');
+        const desktopContainer = document.getElementById('animationModeTitle');
+        const mobileContainer = document.getElementById('animationModeTitleMobile');
+        
+        if (!animate) {
+            // Direct update without animation (for initial load)
+            if (desktopTitleElement) desktopTitleElement.textContent = titleText;
+            if (mobileTitleElement) mobileTitleElement.textContent = titleText;
+            updateBorderColor(desktopContainer, newBorderColor);
+            updateBorderColor(mobileContainer, newBorderColor);
+            return;
+        }
+        
+        // Skip if text hasn't changed
+        if (desktopTitleElement && desktopTitleElement.textContent === titleText) {
+            return;
+        }
+        
+        isAnimating = true;
+        
+        // Animate desktop version
+        if (desktopTitleElement) {
+            backspaceAnimation(desktopTitleElement, () => {
+                updateBorderColor(desktopContainer, newBorderColor);
+                typeAnimation(desktopTitleElement, titleText, () => {
+                    isAnimating = false;
+                });
+            });
+        }
+        
+        // Animate mobile version
+        if (mobileTitleElement) {
+            backspaceAnimation(mobileTitleElement, () => {
+                updateBorderColor(mobileContainer, newBorderColor);
+                typeAnimation(mobileTitleElement, titleText, () => {});
+            });
+        }
+    }
+    
+    // Update title on page load (without animation)
+    updateAnimationTitle(false);
+    
+    // Listen for storage events to detect theme changes from other tabs/windows
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'theme') {
+            updateAnimationTitle(true);
+        }
+    });
+    
+    // Also listen for custom event that can be dispatched when theme changes
+    window.addEventListener('themeChange', () => {
+        updateAnimationTitle(true);
+    });
+    
+    // Poll for theme changes (as a fallback since storage events don't fire in same tab)
+    let lastTheme = localStorage.getItem('theme') || 'fractals';
+    setInterval(() => {
+        const currentTheme = localStorage.getItem('theme') || 'fractals';
+        if (currentTheme !== lastTheme) {
+            lastTheme = currentTheme;
+            updateAnimationTitle(true);
+        }
+    }, 100); // Check every 100ms
+    
+    /**
+     * Dropdown Toggle and Mode Selection Handlers
+     */
+    const desktopTitleButton = document.getElementById('animationModeTitleButton');
+    const mobileTitleButton = document.getElementById('animationModeTitleButtonMobile');
+    const desktopDropdown = document.getElementById('animationDropdown');
+    const mobileDropdown = document.getElementById('animationDropdownMobile');
+    const dropdownArrow = document.getElementById('dropdownArrow');
+    const dropdownArrowMobile = document.getElementById('dropdownArrowMobile');
+    const desktopTitleContainer = document.getElementById('animationModeTitle');
+    const mobileTitleContainer = document.getElementById('animationModeTitleMobile');
+    
+    // Function to toggle dropdown
+    function toggleDropdown(isMobile = false) {
+        const dropdown = isMobile ? mobileDropdown : desktopDropdown;
+        const arrow = isMobile ? dropdownArrowMobile : dropdownArrow;
+        
+        if (!dropdown || !arrow) return;
+        
+        isDropdownOpen = !dropdown.classList.contains('hidden');
+        
+        if (isDropdownOpen) {
+            // Close dropdown
+            dropdown.classList.add('hidden');
+            arrow.style.transform = 'rotate(0deg)';
+            isDropdownOpen = false;
+            // Notify DynamicBGAnim that dropdown is closed
+            window.dispatchEvent(new CustomEvent('animationDropdownToggle', { detail: { isOpen: false } }));
+        } else {
+            // Open dropdown
+            dropdown.classList.remove('hidden');
+            arrow.style.transform = 'rotate(180deg)';
+            isDropdownOpen = true;
+            // Notify DynamicBGAnim that dropdown is open
+            window.dispatchEvent(new CustomEvent('animationDropdownToggle', { detail: { isOpen: true } }));
+        }
+    }
+    
+    // Desktop button click handler
+    if (desktopTitleButton) {
+        desktopTitleButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown(false);
+        });
+    }
+    
+    // Mobile button click handler
+    if (mobileTitleButton) {
+        mobileTitleButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown(true);
+        });
+    }
+    
+    // Handle hover events for slowdown effect
+    if (desktopTitleContainer) {
+        desktopTitleContainer.addEventListener('mouseenter', () => {
+            window.dispatchEvent(new Event('animationTitleHoverStart'));
+        });
+        desktopTitleContainer.addEventListener('mouseleave', () => {
+            window.dispatchEvent(new Event('animationTitleHoverEnd'));
+        });
+    }
+    
+    if (mobileTitleContainer) {
+        mobileTitleContainer.addEventListener('mouseenter', () => {
+            window.dispatchEvent(new Event('animationTitleHoverStart'));
+        });
+        mobileTitleContainer.addEventListener('mouseleave', () => {
+            window.dispatchEvent(new Event('animationTitleHoverEnd'));
+        });
+    }
+    
+    // Desktop dropdown option click handlers
+    const desktopOptions = document.querySelectorAll('.animation-option');
+    desktopOptions.forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const mode = option.getAttribute('data-mode');
+            if (mode) {
+                // Dispatch event to switch to specific mode
+                window.dispatchEvent(new CustomEvent('switchToSpecificMode', { detail: { mode } }));
+                // Close dropdown
+                toggleDropdown(false);
+            }
+        });
+        
+        // Hover effect for options
+        option.addEventListener('mouseenter', () => {
+            option.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        });
+        option.addEventListener('mouseleave', () => {
+            option.style.backgroundColor = 'transparent';
+        });
+    });
+    
+    // Mobile dropdown option click handlers
+    const mobileOptions = document.querySelectorAll('.animation-option-mobile');
+    mobileOptions.forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const mode = option.getAttribute('data-mode');
+            if (mode) {
+                // Dispatch event to switch to specific mode
+                window.dispatchEvent(new CustomEvent('switchToSpecificMode', { detail: { mode } }));
+                // Close dropdown
+                toggleDropdown(true);
+            }
+        });
+        
+        // Hover effect for options
+        option.addEventListener('mouseenter', () => {
+            option.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        });
+        option.addEventListener('mouseleave', () => {
+            option.style.backgroundColor = 'transparent';
+        });
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (desktopDropdown && !desktopDropdown.classList.contains('hidden')) {
+            toggleDropdown(false);
+        }
+        if (mobileDropdown && !mobileDropdown.classList.contains('hidden')) {
+            toggleDropdown(true);
+        }
+    });
 </script>

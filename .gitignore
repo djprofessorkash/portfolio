@@ -1,10 +1,10 @@
-# build output
+# Build Output
 dist/
 
-# generated types
+# Astro Generation Content
 .astro/
 
-# dependencies
+# Node Dependencies
 node_modules/
 
 # logs
@@ -13,19 +13,23 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# environment variables
+# Environment Variables
 .env
 .env.production
 
-# macOS-specific files
-.DS_Store
-
-# jetbrains setting folder
+# JetBrains Settings
 .idea/
 
-# frozen dependency states
+# Frozen NPM Dependencies
 package-lock.json
 
-# extensions to VSCode
+# VSCode Extensions and Settings
 .vscode/
 */.vscode/
+
+# MacOS Junk Data
+.DS_Store
+*/.DS_Store
+
+# Internal Features Doc
+FEATURES.md

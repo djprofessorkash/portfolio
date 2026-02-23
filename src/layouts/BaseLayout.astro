@@ -31,6 +31,9 @@ const { type } = Astro.props;
 
 // Construct the full page URL for Open Graph metadata.
 const pageUrl = `https://kash.fyi${Astro.url.pathname}`;
+
+// Determine if we're on the About page for conditional footer scroll-up button
+const isAboutPage = Astro.url.pathname === '/about/' || Astro.url.pathname === '/about';
 ---
 
 <!doctype html>
@@ -39,8 +42,8 @@ const pageUrl = `https://kash.fyi${Astro.url.pathname}`;
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <!-- Favicon -->
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <!-- Favicon (Change this at some point to something... better.) -->
+        <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
         <!-- Page title displayed in browser tab -->
         <title>DJ Professor Kash</title>
@@ -62,12 +65,7 @@ const pageUrl = `https://kash.fyi${Astro.url.pathname}`;
         <link
             rel="preload"
             as="image"
-            href="https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/DJPKLogos_Pl&AuCombinedOnAg_Revised.png"
-        />
-        <link
-            rel="preload"
-            as="image"
-            href="https://codeberg.org/djprofessorkash/kash-dot-fyi/raw/branch/main/public/media/DJPKLogos_Pl&AuCombinedOnBl_Revised.png"
+            href="/media/home-logo.svg"
         />
 
         <!-- 
@@ -126,21 +124,6 @@ const pageUrl = `https://kash.fyi${Astro.url.pathname}`;
     <body
         class="top bg-silver dark:bg-silver text-pearl dark:text-pearl w-full font-poppins overflow-y-scroll overflow-x-hidden relative"
     >
-        <!-- 
-          Back to Top Button
-          Fixed position button that appears after scrolling down 50% of viewport height.
-          Smoothly scrolls back to the top of the page when clicked.
-        -->
-        <div
-            id="backToTop"
-            class="text-3xl md:text-4xl fixed left-1/2 -translate-x-1/2 bottom-4 md:bottom-8 z-50 active:animate-ping"
-        >
-            <a href="#top">
-                <i
-                    class="fa-solid fa-circle-arrow-up text-pearl dark:text-white dynamic-hover"
-                ></i>
-            </a>
-        </div>
 
         <!-- Page Transition Overlay -->
         <div id="page-transition-overlay" class="fixed inset-0 bg-pearl z-[9999] pointer-events-none transition-opacity duration-500 flex items-center justify-center" style="opacity: 1;">
@@ -163,7 +146,7 @@ const pageUrl = `https://kash.fyi${Astro.url.pathname}`;
         <PageTheme />
         <PageHeader />
         <slot />
-        <PageFooter />
+        <PageFooter showScrollUp={isAboutPage} />
     </body>
 </html>
 

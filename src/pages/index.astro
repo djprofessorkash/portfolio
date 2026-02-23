@@ -1,7 +1,7 @@
 ---
 // Homepage - Landing page with interactive name display and animated background.
 import BaseLayout from "../layouts/BaseLayout.astro";
-import DynamicGeometry from "../components/DynamicGeometry.astro";
+import DynamicBGAnim from "../components/DynamicBGAnim.astro";
 ---
 
 <BaseLayout
@@ -15,7 +15,7 @@ import DynamicGeometry from "../components/DynamicGeometry.astro";
 			class="bg-silver dark:bg-silver text-pearl dark:text-pearl m-5 flex flex-col items-center justify-center space-y-6"
 		>
 			<!-- Dynamic particle animation background (fractal or orbiting mode) -->
-			<DynamicGeometry />
+			<DynamicBGAnim />
 
 			<div
 				class="h-screen text-white flex flex-col items-center justify-center space-y-6"
@@ -57,20 +57,22 @@ import DynamicGeometry from "../components/DynamicGeometry.astro";
 							Projects
 						</button>
 					</a>
-					<button
-						id="allResearch"
-						class="px-3 py-2 text-lg font-semibold bg-gray-400 text-gray-600 rounded-lg cursor-not-allowed line-through"
-						disabled
-					>
-						Research
-					</button>
-					<button
-						id="allCourses"
-						class="px-3 py-2 text-lg font-semibold bg-gray-400 text-gray-600 rounded-lg cursor-not-allowed line-through"
-						disabled
-					>
-						Courses
-					</button>
+					<a id="directLinkToResearch" href="/research/">
+						<button
+							id="allResearch"
+							class="px-3 py-2 text-lg font-semibold bg-pearl text-silver rounded-lg dynamic-hover-bg hover:text-pearl transition"
+						>
+							Research
+						</button>
+					</a>
+					<a id="directLinkToCourses" href="/teaching/">
+						<button
+							id="allCourses"
+							class="px-3 py-2 text-lg font-semibold bg-pearl text-silver rounded-lg dynamic-hover-bg hover:text-pearl transition"
+						>
+							Courses
+						</button>
+					</a>
 				</div>
 			</div>
 		</section>

@@ -1,3 +1,22 @@
+---
+/**
+ * Page Footer Component
+ * 
+ * Displays a fixed footer bar with a friendly message and quick access to external social media
+ * and professional profile links (GitHub, Codeberg, LinkedIn, Resume, Email). Provides consistent 
+ * branding and navigation across all pages of the site.
+ * 
+ * Props:
+ * - showScrollUp: Boolean to conditionally display scroll-to-top button (for About page)
+ */
+
+interface Props {
+    showScrollUp?: boolean;
+}
+
+const { showScrollUp = false } = Astro.props;
+---
+
 <!-- 
   Page Footer Component
   
@@ -137,4 +156,18 @@
             </svg>
         </a>
     </div>
+    
+    <!-- Scroll-up button (visible only on About page) -->
+    {showScrollUp && (
+        <button 
+            id="scroll-to-top-btn" 
+            class="absolute -top-20 left-1/2 transform -translate-x-1/2 z-30 cursor-pointer transition-all duration-500 hover:scale-110 bg-pearl/10 p-3 rounded-full backdrop-blur-sm"
+            style="opacity: 0; pointer-events: none;"
+            aria-label="Scroll to top"
+        >
+            <svg class="w-10 h-10 text-pearl" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="transform: rotate(180deg);">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </button>
+    )}
 </div>

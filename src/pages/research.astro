@@ -1,17 +1,379 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import DynamicGeometry from "../components/DynamicGeometry.astro";
+import DynamicBGAnim from "../components/DynamicBGAnim.astro";
+import researchData from "../data/research.json";
+
+const research = researchData.research;
+const domainsFiltering = researchData.domainsFiltering;
 ---
 
-<BaseLayout title="Aakash Sudhakar" description="Understanding the world and human expression through code and communication." type="website">
-    <div id="contact" class="m-5">
-        <DynamicGeometry />
-        <div class="flex flex-col-reverse md:flex-row md:justify-start gap-6 md:gap-12 mt-7 md:mt-12 md:items-end text-balance">
-            <div class="md:w-1/2 text-pretty" id="texts">
-                <div id="left" class="max-w-md" >
-                    research opportunities.
+<BaseLayout title="Research - Aakash Sudhakar" description="Explore my research in data science, economics, sustainability, and governance." type="website">
+    <div class="relative min-h-screen">
+        <DynamicBGAnim />
+        
+        <!-- Research Container -->
+        <div class="relative z-20 py-20 px-6 md:px-12 lg:px-20">
+            <!-- Domain Filters -->
+            <div class="mb-12 flex justify-end">
+                <div id="domain-filters" class="flex items-center gap-1 text-xs font-poppins text-pearl/50 uppercase">
+                    <button
+                        class="domain-filter font-semibold transition-all duration-300 hover:text-pearl cursor-pointer text-pearl"
+                        data-domain="ALL"
+                    >
+                        ALL
+                    </button>
+                    {domainsFiltering.map((domain, index) => (
+                        <>
+                            <span class="text-pearl/30 mx-0.5">/</span>
+                            <button
+                                class="domain-filter font-semibold transition-all duration-300 hover:text-pearl cursor-pointer"
+                                data-domain={domain.value}
+                            >
+                                {domain.display}
+                            </button>
+                        </>
+                    ))}
+                </div>
+            </div>
+
+            <!-- Research Grid -->
+            <div id="research-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4 max-w-4xl mx-auto">
+                <!-- Research items will be loaded dynamically -->
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="hidden text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-pearl"></div>
+            </div>
+        </div>
+
+        <!-- Hidden data for client-side rendering -->
+        <script type="application/json" id="research-data" set:html={JSON.stringify(research)} />
+        <script type="application/json" id="domains-data" set:html={JSON.stringify(domainsFiltering)} />
+
+        <!-- Research Detail Modal -->
+        <div id="research-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-md p-4">
+            <div class="relative w-full max-w-5xl max-h-[90vh] bg-silver rounded-2xl shadow-2xl overflow-hidden">
+                <!-- Close Button -->
+                <button 
+                    id="close-modal" 
+                    class="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-pearl rounded-full p-3 transition-all duration-300 hover:scale-110"
+                    aria-label="Close modal"
+                >
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+
+                <!-- Modal Content -->
+                <div class="overflow-y-auto max-h-[90vh]">
+                    <div class="grid md:grid-cols-5 gap-0">
+                        <!-- Image Section -->
+                        <div class="relative md:col-span-2 h-64 md:h-full">
+                            <img 
+                                id="modal-image" 
+                                src="" 
+                                alt="" 
+                                class="w-full h-full object-cover"
+                            />
+                        </div>
+
+                        <!-- Content Section -->
+                        <div class="md:col-span-3 p-8 md:p-10 flex flex-col">
+                            <!-- Research Name -->
+                            <h2 id="modal-title" class="text-3xl md:text-4xl font-bold font-poppins text-pearl mb-4">
+                            </h2>
+
+                            <!-- Tagline -->
+                            <p id="modal-tagline" class="text-lg md:text-xl font-medium font-poppins text-pearl/80 mb-6 italic">
+                            </p>
+
+                            <!-- Description -->
+                            <p id="modal-description" class="text-base font-poppins text-pearl/90 mb-8 leading-relaxed">
+                            </p>
+
+                            <!-- Domains -->
+                            <div class="mb-8">
+                                <h3 class="text-sm font-bold font-poppins text-pearl/70 mb-4 uppercase tracking-wider">
+                                    Research Domains
+                                </h3>
+                                <div id="modal-domains" class="flex flex-wrap gap-2">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </BaseLayout>
+
+<style>
+    /* Research card animations */
+    .research-card {
+        opacity: 0;
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Modal animations */
+    #research-modal {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    #research-modal > div {
+        animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Get all research data
+        const researchDataElement = document.getElementById('research-data');
+        const allResearch = researchDataElement ? JSON.parse(researchDataElement.textContent || '[]') : [];
+        
+        const researchGrid = document.getElementById('research-grid');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const modal = document.getElementById('research-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        
+        if (!researchGrid || !modal || !closeModalBtn) return;
+
+        let currentIndex = 0;
+        const RESEARCH_PER_LOAD = 3;
+        const INITIAL_LOAD = 9;
+        let isLoading = false;
+        let activeFilter: string | null = 'ALL';
+        let filteredResearch: any[] = [];
+
+        // Create research card HTML
+        function createResearchCard(researchItem: any): Promise<HTMLElement> {
+            return new Promise((resolve) => {
+                const article = document.createElement('article');
+                article.className = 'research-card group relative bg-silver/10 backdrop-blur-sm rounded-lg overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl border border-pearl/10 hover:border-pearl/30';
+                article.setAttribute('data-research-data', JSON.stringify(researchItem));
+                
+                // Preload both images
+                const img1 = new Image();
+                const img2 = new Image();
+                let loadedCount = 0;
+                
+                const checkLoaded = () => {
+                    loadedCount++;
+                    if (loadedCount === 2) {
+                        article.innerHTML = `
+                            <div class="relative aspect-square overflow-hidden bg-silver">
+                                <!-- Base image -->
+                                <img 
+                                    src="${researchItem.imageURLOnDisplay}" 
+                                    alt="${researchItem.name}"
+                                    class="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:opacity-0"
+                                />
+                                <!-- Hover image -->
+                                <img 
+                                    src="${researchItem.imageURLOnHover}" 
+                                    alt="${researchItem.name}"
+                                    class="absolute inset-0 w-full h-full object-cover transition-all duration-500 opacity-0 group-hover:opacity-100 group-hover:scale-110"
+                                />
+                                <!-- Hover overlay with title and domains -->
+                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/70 transition-all duration-300 flex flex-col items-center justify-center p-4 gap-2">
+                                    <h2 class="text-sm md:text-base font-bold font-poppins text-pearl text-center leading-snug opacity-0 group-hover:opacity-100 invisible group-hover:visible translate-y-8 group-hover:translate-y-0 transition-all duration-300">
+                                        ${researchItem.name}
+                                    </h2>
+                                    <p class="text-xs font-medium font-poppins text-pearl/80 text-center uppercase tracking-wide opacity-0 group-hover:opacity-100 invisible group-hover:visible translate-y-8 group-hover:translate-y-0 transition-all duration-300 delay-75">
+                                        ${researchItem.skills.join(', ')}
+                                    </p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Add click handler
+                        article.addEventListener('click', () => {
+                            openModal(researchItem);
+                        });
+                        
+                        resolve(article);
+                    }
+                };
+                
+                img1.onload = checkLoaded;
+                img2.onload = checkLoaded;
+                
+                img1.onerror = () => {
+                    // If image fails to load, still create the card
+                    checkLoaded();
+                };
+                
+                img2.onerror = () => {
+                    // If image fails to load, still create the card
+                    checkLoaded();
+                };
+                
+                img1.src = researchItem.imageURLOnDisplay;
+                img2.src = researchItem.imageURLOnHover;
+            });
+        }
+
+        // Filter research based on active filter and isActive status
+        function updateFilteredResearch() {
+            const activeResearch = allResearch.filter((researchItem: any) => researchItem.isActive);
+            
+            if (!activeFilter || activeFilter === 'ALL') {
+                filteredResearch = activeResearch;
+            } else {
+                filteredResearch = activeResearch.filter((researchItem: any) => {
+                    return researchItem.skills.includes(activeFilter);
+                });
+            }
+        }
+
+        // Load research items into grid
+        async function loadResearch(count: number) {
+            if (isLoading || currentIndex >= filteredResearch.length) return;
+            
+            isLoading = true;
+            if (loadingIndicator) loadingIndicator.classList.remove('hidden');
+            
+            const endIndex = Math.min(currentIndex + count, filteredResearch.length);
+            const cardPromises = [];
+            
+            // Create all cards and wait for images to preload
+            for (let i = currentIndex; i < endIndex; i++) {
+                cardPromises.push(createResearchCard(filteredResearch[i]));
+            }
+            
+            const cardsToAdd = await Promise.all(cardPromises);
+            
+            // Add cards with staggered animation delays after images are loaded
+            cardsToAdd.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.15}s`;
+                researchGrid?.appendChild(card);
+            });
+            
+            currentIndex = endIndex;
+            isLoading = false;
+            if (loadingIndicator) loadingIndicator.classList.add('hidden');
+        }
+
+        // Check if user scrolled near bottom
+        function checkScroll() {
+            if (isLoading || currentIndex >= filteredResearch.length) return;
+            
+            const scrollPosition = window.innerHeight + window.scrollY;
+            const threshold = document.documentElement.scrollHeight - 500;
+            
+            if (scrollPosition >= threshold) {
+                loadResearch(RESEARCH_PER_LOAD);
+            }
+        }
+
+        // Modal functions
+        function openModal(researchData: any) {
+            if (!modal) return;
+            
+            document.getElementById('modal-title')!.textContent = researchData.name;
+            document.getElementById('modal-tagline')!.textContent = researchData.tagline;
+            document.getElementById('modal-description')!.textContent = researchData.description;
+            document.getElementById('modal-image')!.setAttribute('src', researchData.imageURLOnExpand);
+            document.getElementById('modal-image')!.setAttribute('alt', researchData.name);
+            
+            // Domains
+            const domainsContainer = document.getElementById('modal-domains');
+            if (domainsContainer) {
+                domainsContainer.innerHTML = '';
+                researchData.skills.forEach((skill: string) => {
+                    const span = document.createElement('span');
+                    span.className = 'px-4 py-2 text-sm font-semibold font-poppins bg-pearl text-silver rounded-full';
+                    span.textContent = skill;
+                    domainsContainer.appendChild(span);
+                });
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            if (!modal) return;
+            
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal handlers
+        closeModalBtn.addEventListener('click', closeModal);
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Domain filter handlers
+        const filterButtons = document.querySelectorAll('.domain-filter');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const domain = button.getAttribute('data-domain');
+                if (!domain) return;
+
+                // Deselect all filters
+                filterButtons.forEach(btn => {
+                    btn.classList.remove('text-pearl');
+                    btn.classList.add('text-pearl/50');
+                });
+
+                // Select clicked filter
+                button.classList.remove('text-pearl/50');
+                button.classList.add('text-pearl');
+                activeFilter = domain;
+
+                // Reset and reload with filtered research
+                updateFilteredResearch();
+                currentIndex = 0;
+                if (researchGrid) researchGrid.innerHTML = '';
+                loadResearch(INITIAL_LOAD);
+            });
+        });
+
+        // Scroll event listener
+        window.addEventListener('scroll', checkScroll);
+
+        // Initialize filtered research and load initial research items
+        updateFilteredResearch();
+        loadResearch(INITIAL_LOAD);
+    });
+</script>

@@ -1,0 +1,87 @@
+{
+    "subjectsFiltering": [
+        { "display": "COMP SCI", "value": "Computer Science" },
+        { "display": "DATA SCI", "value": "Data Science" },
+        { "display": "HPDS", "value": "History and Philosophy of Digital Sciences" },
+        { "display": "POPUPS", "value": "Popup Seminars" }
+    ],
+    "teaching": [
+        {
+            "id": 1,
+            "name": "Computer Science Fundamentals",
+            "tagline": "Project-based learning course in computer science fundamentals for beginners.",
+            "topics": "?",
+            "imageURLOnDisplay": "https://placedog.net/600/400",
+            "imageURLOnHover": "https://placedog.net/600/800",
+            "imageURLOnExpand": "https://placedog.net/600/1200",
+            "subjects": ["Computer Science"],
+            "isActive": true
+        },
+        {
+            "id": 2,
+            "name": "Algorithmic Design Principles",
+            "tagline": "Reinterpretation of intermediate computer science principles, focusing on architecting algorithms from scratch.",
+            "topics": "?",
+            "imageURLOnDisplay": "https://placedog.net/600/401",
+            "imageURLOnHover": "https://placedog.net/600/801",
+            "imageURLOnExpand": "https://placedog.net/600/1201",
+            "subjects": ["Computer Science"],
+            "isActive": true
+        },
+        {
+            "id": 3,
+            "name": "Data Visualization and Communication",
+            "tagline": "Introductory course on contemporary data visualization and presentation techniques with a multidisciplinary perspective.",
+            "topics": "?",
+            "imageURLOnDisplay": "https://placedog.net/600/402",
+            "imageURLOnHover": "https://placedog.net/600/802",
+            "imageURLOnExpand": "https://placedog.net/600/1202",
+            "subjects": ["Data Science"],
+            "isActive": true
+        },
+        {
+            "id": 4,
+            "name": "Machine Learning Foundations",
+            "tagline": "Project-based and domain-agnostic introduction to historical and contemporary machine learning techniques.",
+            "topics": "?",
+            "imageURLOnDisplay": "https://placedog.net/600/403",
+            "imageURLOnHover": "https://placedog.net/600/803",
+            "imageURLOnExpand": "https://placedog.net/600/1203",
+            "subjects": ["Data Science"],
+            "isActive": true
+        },
+        {
+            "id": 5,
+            "name": "Deep Learning and Modeling Design",
+            "tagline": "Higher-level course on project-based modeling, with a particular focus on neural network design and implementation.",
+            "topics": "?",
+            "imageURLOnDisplay": "https://placedog.net/600/404",
+            "imageURLOnHover": "https://placedog.net/600/804",
+            "imageURLOnExpand": "https://placedog.net/600/1204",
+            "subjects": ["Data Science"],
+            "isActive": true
+        },
+        {
+            "id": 6,
+            "name": "Machine Learning in Production",
+            "tagline": "Adaptive course covering wide range of topics in deploying and scaling machine learning architectures.",
+            "topics": "?",
+            "imageURLOnDisplay": "https://placedog.net/600/405",
+            "imageURLOnHover": "https://placedog.net/600/805",
+            "imageURLOnExpand": "https://placedog.net/600/1205",
+            "subjects": ["Data Science"],
+            "isActive": true
+        },
+        {
+            "id": 7,
+            "name": "TBD.",
+            "tagline": "",
+            "topics": "?",
+            "imageURLOnDisplay": "https://placedog.net/600/406",
+            "imageURLOnHover": "https://placedog.net/600/806",
+            "imageURLOnExpand": "https://placedog.net/600/1206",
+            "subjects": ["History and Philosophy of Digital Sciences"],
+            "isActive": false
+        }
+    ]
+}

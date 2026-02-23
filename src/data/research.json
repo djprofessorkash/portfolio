@@ -1,0 +1,54 @@
+{
+  "domainsFiltering": [
+    { "display": "DATA", "value": "Data Science" },
+    { "display": "ECON", "value": "Economics" },
+    { "display": "SCIENCE", "value": "Applied Sciences" },
+    { "display": "GOV", "value": "Governance" }
+  ],
+  "research": [
+    {
+      "id": 1,
+      "name": "Constructing Alternative Indices to GDP",
+      "tagline": "Analyzing data on human factors and conditions as expressions of socioeconomic development.",
+      "description": "TBD.",
+      "imageURLOnDisplay": "https://placedog.net/600/400",
+      "imageURLOnHover": "https://placedog.net/600/800",
+      "imageURLOnExpand": "https://placedog.net/600/1200",
+      "skills": ["Economics", "Data Science"],
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "name": "Architecting Regenerative Ocean Economies",
+      "tagline": "TBD.",
+      "description": "TBD.",
+      "imageURLOnDisplay": "https://placedog.net/600/401",
+      "imageURLOnHover": "https://placedog.net/600/801",
+      "imageURLOnExpand": "https://placedog.net/600/1201",
+      "skills": ["Applied Sciences", "Data Science"],
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "name": "Building Frameworks for AI Auditing and Bias Scoring",
+      "tagline": "TBD.",
+      "description": "TBD.",
+      "imageURLOnDisplay": "https://placedog.net/600/402",
+      "imageURLOnHover": "https://placedog.net/600/802",
+      "imageURLOnExpand": "https://placedog.net/600/1202",
+      "skills": ["Data Science"],
+      "isActive": true
+    },
+    {
+      "id": 4,
+      "name": "Improving Transparency and Access to Policing Data",
+      "tagline": "TBD.",
+      "description": "TBD.",
+      "imageURLOnDisplay": "https://placedog.net/600/403",
+      "imageURLOnHover": "https://placedog.net/600/803",
+      "imageURLOnExpand": "https://placedog.net/600/1203",
+      "skills": ["Governance", "Data Science"],
+      "isActive": true
+    }
+  ]
+}
